@@ -1,0 +1,60 @@
+inherit_gem:
+  rubocop-shopify: rubocop.yml
+
+require:
+  - rubocop-angellist
+  - rubocop-graphql
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-sorbet
+  - rubocop-thread_safety
+
+AllCops:
+  TargetRailsVersion: 7.0
+  TargetRubyVersion: 3.3
+  Exclude:
+    - app/views/**/* # Dont think this is necessary but… whatever
+    - bin/**/*
+    - db/**/*
+    - frontend/**/*
+    - node_modules/**/*
+    - public/**/*
+    - script/**/*
+    - sorbet/**/*
+    - test/**/*
+    - tmp/**/*
+    - vendor/**/*
+
+# Add Rubocop rules we want to override below, sort them alphabetically
+
+Lint/AssignmentInCondition: { Enabled: true, AllowSafeAssignment: false }
+
+Layout/EmptyLineAfterGuardClause: { Enabled: true }
+Layout/LineLength: { Enabled: false }
+Layout/SpaceInsideBlockBraces: { Enabled: true, }
+Layout/TrailingEmptyLines: { Enabled: true, EnforcedStyle: final_newline }
+
+Naming/InclusiveLanguage: { Enabled: false }
+Naming/PredicateName: { Enabled: false }
+
+Rails/Delegate: { Enabled: false }
+
+Sorbet/EnforceSigilOrder: { Enabled: false }
+
+Style/BlockDelimiters: { Enabled: true }
+Style/CommentAnnotation: { Enabled: false }
+Style/DateTime: { Enabled: true, AllowCoercion: false }
+Style/InvertibleUnlessCondition: { Enabled: true }
+Style/MethodCallWithArgsParentheses: { Enabled: false }
+Style/NegatedIf: { Enabled: false }
+Style/ClassAndModuleChildren: { Enabled: true, EnforcedStyle: compact }
+Style/OpenStructUse: { Enabled: false }
+Style/SafeNavigation: { Enabled: false }
+Style/StringLiterals: { Enabled: true, EnforcedStyle: single_quotes }
+Style/StringLiteralsInInterpolation: { Enabled: true, EnforcedStyle: single_quotes }
+Style/TrailingCommaInArguments: { Enabled: true, EnforcedStyleForMultiline: consistent_comma }
+Style/TrailingCommaInBlockArgs: { Enabled: true }
+Style/TrivialAccessors: { Enabled: false }
+Style/WordArray: { Enabled: false }
