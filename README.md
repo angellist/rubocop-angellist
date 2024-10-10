@@ -8,7 +8,7 @@ Add the gem to the development dependencies:
 
 ```ruby
 group :development do
-  gem 'rubocop-angellist', git: 'git@github.com:angellist/rubocop-angellist.git'
+  gem 'rubocop-angellist', github: 'angellist/rubocop-angellist'
 end
 ```
 
