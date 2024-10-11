@@ -29,10 +29,13 @@ AllCops:
 
 # Add Rubocop rules we want to override below, sort them alphabetically
 
+GraphQL/ArgumentDescription: { Enabled: false }
+GraphQL/ArgumentName: { Enabled: false }
 GraphQL/ExtractType: { Enabled: false }
 GraphQL/FieldDescription: { Enabled: false }
 GraphQL/FieldName: { Enabled: false }
 GraphQL/ObjectDescription: { Enabled: false }
+GraphQL/OrderedArguments: { Enabled: false }
 GraphQL/OrderedFields: { Enabled: false }
 
 Lint/AssignmentInCondition: { Enabled: true, AllowSafeAssignment: false }
