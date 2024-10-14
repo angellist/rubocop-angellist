@@ -50,6 +50,12 @@ Naming/PredicateName: { Enabled: false }
 
 Rails/Delegate: { Enabled: false }
 
+RSpec/ExampleLength: { Enabled: false }
+RSpec/MultipleMemoizedHelpers: { Enabled: false }
+RSpec/MessageSpies: { Enabled: false }
+RSpec/MultipleExpectations: { Enabled: false }
+RSpec/StubbedMock: { Enabled: false }
+
 Sorbet/EnforceSigilOrder: { Enabled: false }
 
 Style/BlockDelimiters: { Enabled: true }
