@@ -1,9 +1,7 @@
-# Angellist:
-#   Enabled: true
-#   Include:
-#     - "**/angellist/**/*"
+Angellist:
+  Enabled: true
 
-# Angellist/SidekiqDontUseKeywordArguments:
-#   Enabled: true
-#   VersionAdded: '1.0.0'
-#   Description: 'Dont use kwargs in sidekiq workers'
+Angellist/NoUnless:
+  Enabled: true
+  Description: 'Always prefer `if` over `unless`.'
+  VersionAdded: '1.0.0'

@@ -6,3 +6,6 @@ Sorbet:
 Naming/FileName:
  Exclude:
    - lib/rubocop-angellist.rb
+
+Style/ClassAndModuleChildren:
+  Enabled: false

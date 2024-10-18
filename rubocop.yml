@@ -27,6 +27,9 @@ AllCops:
     - tmp/**/*
     - vendor/**/*
 
+Angellist:
+  Enabled: true
+
 # Add Rubocop rules we want to override below, sort them alphabetically
 
 GraphQL/ArgumentDescription: { Enabled: false }
@@ -61,7 +64,8 @@ Sorbet/EnforceSigilOrder: { Enabled: false }
 Style/BlockDelimiters: { Enabled: true }
 Style/CommentAnnotation: { Enabled: false }
 Style/DateTime: { Enabled: true, AllowCoercion: false }
-Style/InvertibleUnlessCondition: { Enabled: true }
+Style/GuardClause: { Enabled: true }
+Style/InvertibleUnlessCondition: { Enabled: false }
 Style/MethodCallWithArgsParentheses: { Enabled: false }
 Style/NegatedIf: { Enabled: false }
 Style/ClassAndModuleChildren: { Enabled: true, EnforcedStyle: compact }
