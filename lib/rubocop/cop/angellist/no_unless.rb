@@ -44,7 +44,11 @@ module RuboCop
             corrector.replace(node.loc.operator, node.inverse_operator)
             autocorrect(corrector, node.lhs)
             autocorrect(corrector, node.rhs)
-          when :lvar, :true, :false
+          when :true
+            corrector.replace(node.loc.expression, 'false')
+          when :false
+            corrector.replace(node.loc.expression, 'true')
+          else
             corrector.replace(node.loc.expression, "!#{node.source}")
           end
         end
