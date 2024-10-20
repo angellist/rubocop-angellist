@@ -54,10 +54,23 @@ module RuboCop
         end
 
         def autocorrect_send_node(corrector, node)
-          if node.method?(:!)
+          if inverse_comparisons.key?(node.method_name)
+            corrector.replace(node.loc.selector, inverse_comparisons[node.method_name].to_s)
+          elsif node.method?(:!)
             corrector.remove(node.loc.selector)
           else
             corrector.replace(node.loc.expression, "!#{node.source}")
+          end
+        end
+
+        def inverse_comparisons
+          @inverse_comparisons ||= begin
+            method_mappings = {
+              :== => :!=,
+              :> => :<=,
+              :< => :>=,
+            }
+            method_mappings.merge(method_mappings.invert)
           end
         end
       end
