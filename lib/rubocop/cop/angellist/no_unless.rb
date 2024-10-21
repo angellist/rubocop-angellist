@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 module RuboCop
@@ -18,11 +19,13 @@ module RuboCop
       #     do_stuff
       #   end
       #
-      class NoUnless < Base
+      class NoUnless < ::RuboCop::Cop::Base
+        extend T::Sig
         extend AutoCorrector
 
         MSG = 'Use `if !condition` instead of `unless condition`.'
 
+        sig { params(node: RuboCop::AST::IfNode).void }
         def on_if(node)
           return if !node.unless?
 
@@ -34,13 +37,16 @@ module RuboCop
 
         private
 
+        sig { params(corrector: RuboCop::Cop::Corrector, node: RuboCop::AST::IfNode).void }
         def autocorrect(corrector, node)
           case node.type
           when :begin
             autocorrect(corrector, node.children.first)
           when :send
+            node = T.cast(node, RuboCop::AST::SendNode)
             autocorrect_send_node(corrector, node)
           when :or, :and
+            node = T.cast(node, T.any(RuboCop::AST::OrNode, RuboCop::AST::AndNode))
             corrector.replace(node.loc.operator, node.inverse_operator)
             autocorrect(corrector, node.lhs)
             autocorrect(corrector, node.rhs)
@@ -53,6 +59,7 @@ module RuboCop
           end
         end
 
+        sig { params(corrector: RuboCop::Cop::Corrector, node: RuboCop::AST::SendNode).void }
         def autocorrect_send_node(corrector, node)
           if inverse_comparisons.key?(node.method_name)
             corrector.replace(node.loc.selector, inverse_comparisons[node.method_name].to_s)
@@ -63,15 +70,19 @@ module RuboCop
           end
         end
 
+        sig { returns(T::Hash[Symbol, Symbol]) }
         def inverse_comparisons
-          @inverse_comparisons ||= begin
-            method_mappings = {
-              :== => :!=,
-              :> => :<=,
-              :< => :>=,
-            }
-            method_mappings.merge(method_mappings.invert)
-          end
+          @inverse_comparisons ||= T.let(
+            begin
+              method_mappings = {
+                :== => :!=,
+                :> => :<=,
+                :< => :>=,
+              }
+              method_mappings.merge(method_mappings.invert)
+            end,
+            T.nilable(T::Hash[Symbol, Symbol]),
+          )
         end
       end
     end

@@ -1,8 +1,5 @@
 inherit_from: rubocop.yml
 
-Sorbet:
-  Enabled: false
-
 Naming/FileName:
  Exclude:
    - lib/rubocop-angellist.rb

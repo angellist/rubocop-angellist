@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 3.3'
 
   s.add_dependency('rubocop', '~> 1')
-
   s.add_dependency('rubocop-graphql')
   s.add_dependency('rubocop-performance')
   s.add_dependency('rubocop-rails')
@@ -29,4 +28,5 @@ Gem::Specification.new do |s|
   s.add_dependency('rubocop-shopify')
   s.add_dependency('rubocop-sorbet')
   s.add_dependency('rubocop-thread_safety')
+  s.add_dependency('sorbet-runtime')
 end

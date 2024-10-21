@@ -5,3 +5,8 @@ Angellist/NoUnless:
   Enabled: true
   Description: 'Always prefer `if` over `unless`.'
   VersionAdded: '1.0.0'
+
+Angellist/PreferDateCurrent:
+  Description: 'Prefer Date.current over Time.zone.today'
+  Enabled: true
+  VersionAdded: '1.0.2'
