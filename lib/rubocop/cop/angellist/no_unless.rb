@@ -37,7 +37,7 @@ module RuboCop
 
         private
 
-        sig { params(corrector: RuboCop::Cop::Corrector, node: RuboCop::AST::IfNode).void }
+        sig { params(corrector: RuboCop::Cop::Corrector, node: RuboCop::AST::Node).void }
         def autocorrect(corrector, node)
           case node.type
           when :begin
@@ -54,6 +54,8 @@ module RuboCop
             corrector.replace(node.loc.expression, 'false')
           when :false
             corrector.replace(node.loc.expression, 'true')
+          when :lvasgn
+            corrector.replace(node.loc.expression, "!(#{node.source})")
           else
             corrector.replace(node.loc.expression, "!#{node.source}")
           end

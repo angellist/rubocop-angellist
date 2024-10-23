@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Angellist::PreferDateCurrent, :config do
@@ -6,16 +7,16 @@ RSpec.describe RuboCop::Cop::Angellist::PreferDateCurrent, :config do
   # TODO: Write test code
   #
   # For example
-  it 'registers an offense when using `#bad_method`' do
+  it 'registers an offense when using `Time.zone.today`' do
     expect_offense(<<~RUBY)
-      bad_method
-      ^^^^^^^^^^ Use `#good_method` instead of `#bad_method`.
+      Time.zone.today
+      ^^^^^^^^^^^^^^^ Angellist/PreferDateCurrent: Use `Date.current` instead of `Time.zone.today`.
     RUBY
   end
 
-  it 'does not register an offense when using `#good_method`' do
+  it 'does not register an offense when using `Date.current`' do
     expect_no_offenses(<<~RUBY)
-      good_method
+      Date.current
     RUBY
   end
 end

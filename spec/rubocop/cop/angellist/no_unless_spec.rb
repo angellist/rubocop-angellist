@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Angellist::NoUnless, :config do
@@ -146,6 +147,17 @@ RSpec.describe RuboCop::Cop::Angellist::NoUnless, :config do
         return if x < y
         return if x != y
         return if x == y
+      RUBY
+    end
+
+    it 'corrects assignments' do
+      expect_offense(<<~RUBY)
+        return unless x = y
+        ^^^^^^^^^^^^^^^^^^^ Angellist/NoUnless: Use `if !condition` instead of `unless condition`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        return if !(x = y)
       RUBY
     end
   end

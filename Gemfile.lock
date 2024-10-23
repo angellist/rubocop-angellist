@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rubocop-angellist (1.0.1)
+    rubocop-angellist (1.0.2)
       rubocop (~> 1)
       rubocop-graphql
       rubocop-performance

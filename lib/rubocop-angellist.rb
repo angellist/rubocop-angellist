@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require 'rubocop'
+require 'sorbet-runtime'
 
 require_relative 'rubocop/angellist'
 require_relative 'rubocop/angellist/version'
