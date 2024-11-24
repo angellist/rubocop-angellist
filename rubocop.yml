@@ -37,6 +37,7 @@ GraphQL/ArgumentName: { Enabled: false }
 GraphQL/ExtractType: { Enabled: false }
 GraphQL/FieldDescription: { Enabled: false }
 GraphQL/FieldName: { Enabled: false }
+GraphQL/FieldMethod: { Enabled: true, AutoCorrect: false }
 GraphQL/ObjectDescription: { Enabled: false }
 GraphQL/OrderedArguments: { Enabled: false }
 GraphQL/OrderedFields: { Enabled: false }
