@@ -64,6 +64,11 @@ RSpec/MultipleExpectations: { Enabled: false }
 RSpec/StubbedMock: { Enabled: false }
 
 Sorbet/EnforceSigilOrder: { Enabled: false }
+Sorbet/FalseSigil: { Enabled: false }
+Sorbet/HasSigil:
+  Enabled: true
+  SuggestedStrictness: 'true'
+  MinimumStrictness: 'false'
 
 Style/BlockDelimiters: { Enabled: true }
 Style/CommentAnnotation: { Enabled: false }
@@ -83,3 +88,4 @@ Style/TrailingCommaInBlockArgs: { Enabled: true }
 Style/TrivialAccessors: { Enabled: false }
 Style/WhileUntilModifier: { Enabled: false }
 Style/WordArray: { Enabled: false }
+0
