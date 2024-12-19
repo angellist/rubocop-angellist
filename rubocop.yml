@@ -88,4 +88,3 @@ Style/TrailingCommaInBlockArgs: { Enabled: true }
 Style/TrivialAccessors: { Enabled: false }
 Style/WhileUntilModifier: { Enabled: false }
 Style/WordArray: { Enabled: false }
-0
