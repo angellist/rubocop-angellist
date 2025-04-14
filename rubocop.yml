@@ -39,8 +39,6 @@ GraphQL/FieldDescription: { Enabled: false }
 GraphQL/FieldName: { Enabled: false }
 GraphQL/FieldMethod: { Enabled: true, AutoCorrect: false }
 GraphQL/ObjectDescription: { Enabled: false }
-GraphQL/OrderedArguments: { Enabled: false }
-GraphQL/OrderedFields: { Enabled: false }
 
 Lint/AssignmentInCondition: { Enabled: true, AllowSafeAssignment: false }
 Lint/SafeNavigationChain:
