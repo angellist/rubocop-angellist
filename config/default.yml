@@ -3,10 +3,15 @@ Angellist:
 
 Angellist/NoUnless:
   Enabled: true
-  Description: 'Always prefer `if` over `unless`.'
-  VersionAdded: '1.0.0'
+  Description: "Always prefer `if` over `unless`."
+  VersionAdded: "1.0.0"
 
 Angellist/PreferDateCurrent:
-  Description: 'Prefer Date.current over Time.zone.today'
+  Description: "Prefer Date.current over Time.zone.today"
   Enabled: true
-  VersionAdded: '1.0.2'
+  VersionAdded: "1.0.2"
+
+Angellist/ForbidInstanceVariableGet:
+  Description: "Forbids the use of instance_variable_get and instance_variable_set"
+  Enabled: true
+  VersionAdded: "1.0.3"
