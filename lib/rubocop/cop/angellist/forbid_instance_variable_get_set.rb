@@ -15,7 +15,7 @@ module RuboCop
       #   object.foo
       #   object.foo = value
       #
-      class ForbidInstanceVariableGet < Base
+      class ForbidInstanceVariableGetSet < Base
         MSG = 'Avoid using `instance_variable_get` or `instance_variable_set`. Prefer using public getters/setters.'
 
         RESTRICT_ON_SEND = %i[instance_variable_get instance_variable_set].freeze
