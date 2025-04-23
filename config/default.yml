@@ -13,5 +13,5 @@ Angellist/PreferDateCurrent:
 
 Angellist/ForbidInstanceVariableGetSet:
   Description: "Forbids the use of instance_variable_get and instance_variable_set"
-  Enabled: true
+  Enabled: false
   VersionAdded: "1.0.3"
