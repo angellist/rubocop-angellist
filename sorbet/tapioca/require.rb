@@ -1,7 +1,10 @@
 # typed: true
 # frozen_string_literal: true
 
-# Add your extra requires here (`bin/tapioca require` can be used to bootstrap this list)
-require 'active_support'
-require 'parser'
-require 'rubocop-rspec'
+require "active_support"
+require "lint_roller"
+require "parser"
+require "rubocop"
+require "rubocop-rspec"
+require "rubocop/rspec/support"
+require "sorbet-runtime"

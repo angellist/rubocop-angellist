@@ -1,7 +1,7 @@
 inherit_gem:
   rubocop-shopify: rubocop.yml
 
-require:
+plugins:
   - rubocop-angellist
   - rubocop-graphql
   - rubocop-performance

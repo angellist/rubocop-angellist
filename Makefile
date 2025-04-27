@@ -5,5 +5,5 @@ sorbet:
 rbi:
 	bundle exec tapioca dsl
 
-rbi_gems:
-	bundle exec tapioca gems
+gem-rbis:
+	bundle exec tapioca gems --no-doc --no-loc

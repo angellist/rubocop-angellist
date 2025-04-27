@@ -8,7 +8,7 @@ gemspec
 gem 'rake'
 gem 'rspec'
 
-gem 'activesupport'
+gem 'activesupport', '~> 7'
 gem 'sorbet-runtime'
 
 gem 'sorbet'

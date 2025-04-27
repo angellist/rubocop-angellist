@@ -2,7 +2,7 @@
 
 module RuboCop
   module Cop
-    module AngelList
+    module Angellist
       # This cop forbids the use of `instance_variable_get` and `instance_variable_set`.
       # These methods bypass encapsulation and make code harder to reason about.
       #
