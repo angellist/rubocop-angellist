@@ -66,8 +66,8 @@ Sorbet/EnforceSigilOrder: { Enabled: false }
 Sorbet/FalseSigil: { Enabled: false }
 Sorbet/HasSigil:
   Enabled: true
-  SuggestedStrictness: 'true'
-  MinimumStrictness: 'false'
+  SuggestedStrictness: 'strict'
+  MinimumStrictness: 'true'
 
 Style/BlockDelimiters: { Enabled: true }
 Style/CommentAnnotation: { Enabled: false }
