@@ -51,7 +51,7 @@ Layout/SpaceInsideBlockBraces: { Enabled: true, }
 Layout/TrailingEmptyLines: { Enabled: true, EnforcedStyle: final_newline }
 
 Naming/InclusiveLanguage: { Enabled: false }
-Naming/PredicateName: { Enabled: false }
+Naming/PredicatePrefix: { Enabled: false }
 
 Rails/Delegate: { Enabled: false }
 
