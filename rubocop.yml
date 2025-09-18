@@ -45,6 +45,32 @@ Lint/SafeNavigationChain:
   Enabled: true
   AllowedMethods: ['present?', 'blank?', 'presence', 'try', 'in?', 'to_money', 'to_d', 'nil?']
 
+Layout/ClassStructure:
+  Enabled: true
+  Severity: warning
+  ExpectedOrder:
+    - module_inclusion
+    - constants
+    - public_class_methods
+    - public_methods
+    - protected_methods
+    - private_methods
+  Categories:
+    module_inclusion:
+      - extend
+      - include
+      - prepend
+    constants:
+      - casgn
+    public_class_methods:
+      - sclass
+    public_methods:
+      - def
+    protected_methods:
+      - protected
+    private_methods:
+      - private
+
 Layout/EmptyLineAfterGuardClause: { Enabled: true }
 Layout/LineLength: { Enabled: false }
 Layout/SpaceInsideBlockBraces: { Enabled: true, }
