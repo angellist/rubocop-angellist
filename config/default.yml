@@ -15,3 +15,9 @@ Angellist/ForbidInstanceVariableGetSet:
   Description: "Forbids the use of instance_variable_get and instance_variable_set"
   Enabled: false
   VersionAdded: "1.0.3"
+
+Angellist/ClassStructure:
+  Description: "Enforces stricter class element ordering for AngelList patterns not caught by base Layout/ClassStructure"
+  Enabled: true
+  VersionAdded: "1.0.4"
+  Severity: warning

@@ -30,6 +30,10 @@ AllCops:
 Angellist:
   Enabled: true
 
+Angellist/ClassStructure:
+  Enabled: true
+  Severity: warning
+
 # Add Rubocop rules we want to override below, sort them alphabetically
 
 GraphQL/ArgumentDescription: { Enabled: false }
@@ -77,7 +81,7 @@ Layout/SpaceInsideBlockBraces: { Enabled: true, }
 Layout/TrailingEmptyLines: { Enabled: true, EnforcedStyle: final_newline }
 
 Naming/InclusiveLanguage: { Enabled: false }
-Naming/PredicatePrefix: { Enabled: false }
+Naming/PredicateName: { Enabled: false }
 
 Rails/Delegate: { Enabled: false }
 
