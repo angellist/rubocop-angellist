@@ -17,7 +17,40 @@ Angellist/ForbidInstanceVariableGetSet:
   VersionAdded: "1.0.3"
 
 Angellist/ClassStructure:
-  Description: "Enforces stricter class element ordering for AngelList patterns not caught by base Layout/ClassStructure"
+  Description: "Enforces stricter class ordering than base Layout::ClassStructure - ensures nested classes come before class methods and class methods come before instance methods"
   Enabled: true
   VersionAdded: "1.0.4"
   Severity: warning
+  ExpectedOrder:
+    - module_inclusion
+    - graphql_object_types
+    - constants
+    - graphql_fields
+    - nested_classes
+    - public_class_methods
+    - public_methods
+    - protected_methods
+    - private_methods
+  Categories:
+    module_inclusion:
+      - extend
+      - include
+      - prepend
+    graphql_object_types:
+      - object_type
+    constants:
+      - casgn
+    graphql_fields:
+      - implements
+      - field
+    nested_classes:
+      - class
+      - module
+    public_class_methods:
+      - sclass
+    public_methods:
+      - def
+    protected_methods:
+      - protected
+    private_methods:
+      - private
