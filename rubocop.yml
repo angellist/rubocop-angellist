@@ -30,8 +30,6 @@ AllCops:
 Angellist:
   Enabled: true
 
-# Angellist/ClassStructure config is inherited from config/default.yml
-
 # Add Rubocop rules we want to override below, sort them alphabetically
 
 GraphQL/ArgumentDescription: { Enabled: false }

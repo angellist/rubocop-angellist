@@ -17,7 +17,7 @@ Angellist/ForbidInstanceVariableGetSet:
   VersionAdded: "1.0.3"
 
 Angellist/ClassStructure:
-  Description: "Enforces stricter class ordering than base Layout::ClassStructure - ensures nested classes come before class methods and class methods come before instance methods"
+  Description: "Enforces strict class ordering (built ontop of Layout::ClassStructure)"
   Enabled: true
   VersionAdded: "1.0.4"
   Severity: warning

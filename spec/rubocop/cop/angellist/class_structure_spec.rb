@@ -20,13 +20,10 @@ RSpec.describe RuboCop::Cop::Angellist::ClassStructure, :config do
     it 'allows constants before nested classes (correct order)' do
       expect_no_offenses(<<~RUBY)
         class GoodOrder
-          # 1. Module inclusions
           extend T::Sig
 
-          # 2. Constants
           TIMEOUT = 30
 
-          # 3. Nested classes
           class InnerClass; end
         end
       RUBY
@@ -173,29 +170,23 @@ RSpec.describe RuboCop::Cop::Angellist::ClassStructure, :config do
     it 'allows properly ordered class' do
       expect_no_offenses(<<~RUBY)
         class PaymentService
-          # I. Module inclusions
           extend T::Sig
           include ActiveSupport::Concern
 
-          # II. Constants
           TIMEOUT = 30
           MAX_RETRIES = 3
 
-          # III. Nested classes
           class PaymentError < StandardError; end
 
           class PaymentRequest < T::Struct
             const :amount, BigDecimal
           end
 
-          # IV. sClass methods
           class << self
             def process(request)
               new(request).process
             end
           end
-
-          # V. Instance methods
           def initialize(request)
             @request = request
           end
@@ -243,14 +234,11 @@ RSpec.describe RuboCop::Cop::Angellist::ClassStructure, :config do
     it 'allows properly ordered graphql type class' do
       expect_no_offenses(<<~RUBY)
         class Types::PaymentType < Types::BaseObject
-          # 1. Object type first
           object_type(Payment)
 
-          # 2. Constants
           RelationType = T.type_alias { T.any(PrivateRelation, PublicRelation) }
           VALID_EVENTS = [:submit, :approve, :cancel]
 
-          # 3. Class methods
           class << self
             sig { params(object: Payment, context: Context)}
             def authorized?(object, context)
@@ -258,13 +246,10 @@ RSpec.describe RuboCop::Cop::Angellist::ClassStructure, :config do
             end
           end
 
-          # 4. GraphQL fields/interfaces
           implements Types::AccountInterface
           implements Types::LedgerInterface
           field :amount, Types::MoneyType
           field :relation, Types::RelationType
-
-          # 5. Instance methods
           sig { returns(Payment::Status) }
           def calculated_status
             Payment::CalculateStatusService.calculated_status(object)

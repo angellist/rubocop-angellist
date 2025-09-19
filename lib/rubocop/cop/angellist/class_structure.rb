@@ -4,88 +4,16 @@
 module RuboCop
   module Cop
     module Angellist
-      # Extends Layout::ClassStructure to enforce stricter ordering rules.
-      # The base cop doesn't catch all violations, specifically:
-      # - Nested classes after class methods
-      # - Class methods after instance methods
-      # - GraphQL field ordering violations
-      #
-      # This cop adds those additional checks while inheriting the base functionality.
-      #
-      # @example
-      #   # bad - nested class after class method
-      #   class Service
-      #     class << self
-      #       def call; end
-      #     end
-      #     
-      #     class Error < StandardError; end # Should be before class methods
-      #   end
-      #
-      #   # bad - class method after instance method  
-      #   class Model
-      #     def instance_method; end
-      #     
-      #     class << self
-      #       def class_method; end # Should be before instance methods
-      #     end
-      #   end
-      #
-      #   # bad - GraphQL object_type after constant
-      #   class Types::PaymentType < Types::BaseObject
-      #     RelationType = T.type_alias { T.any(PrivateRelation, PublicRelation) }
-      #     
-      #     object_type(Payment) # Should be before constants
-      #     field :amount, Types::MoneyType
-      #   end
-      #
-      #   # bad - class method after GraphQL field
-      #   class Types::PaymentType < Types::BaseObject
-      #     object_type(Payment)
-      #     field :amount, Types::MoneyType
-      #     
-      #     class << self # Should be before GraphQL fields
-      #       def authorized?(object, context); end
-      #     end
-      #   end
-      #
-      #   # good
-      #   class Service
-      #     class Error < StandardError; end
-      #     
-      #     class << self
-      #       def call; end
-      #     end
-      #     
-      #     def instance_method; end
-      #   end
-      #
-      #   # good - GraphQL class with proper ordering
-      #   class Types::PaymentType < Types::BaseObject
-      #     object_type(Payment)
-      #     
-      #     RelationType = T.type_alias { T.any(PrivateRelation, PublicRelation) }
-      #     
-      #     class << self
-      #       def authorized?(object, context); end
-      #     end
-      #     
-      #     field :amount, Types::MoneyType
-      #     implements Types::AccountInterface
-      #   end
-      #
+      # Extends Layout::ClassStructure to enforce stricter ordering:
+      # - Nested classes before class methods
+      # - Class methods before instance methods  
+      # - GraphQL object_type before constants
+      # - Class methods before GraphQL fields
       class ClassStructure < ::RuboCop::Cop::Layout::ClassStructure
         MSG = '`%<current>s` is supposed to appear before `%<previous>s`.'
-        
-        # This cop inherits configuration parameters from Layout::ClassStructure
-        # Parameters like ExpectedOrder and Categories are accessed via cop_config
-        # and automatically supported through RuboCop's inheritance system
 
         def on_class(class_node)
-          # First run the base cop's checks
           super
-          
-          # Then add our additional strict checks
           check_strict_ordering(class_node)
         end
 
