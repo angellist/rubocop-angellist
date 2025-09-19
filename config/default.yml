@@ -25,9 +25,9 @@ Angellist/ClassStructure:
     - module_inclusion
     - graphql_object_types
     - constants
-    - graphql_fields
     - nested_classes
     - public_class_methods
+    - graphql_fields
     - public_methods
     - protected_methods
     - private_methods
