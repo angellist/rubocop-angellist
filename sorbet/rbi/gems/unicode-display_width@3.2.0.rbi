@@ -34,6 +34,7 @@ Unicode::DisplayWidth::EMOJI_SEQUENCES_REGEX_MAPPING = T.let(T.unsafe(nil), Hash
 
 module Unicode::DisplayWidth::EmojiSupport
   class << self
+    def _recommended; end
     def recommended; end
   end
 end

@@ -95,7 +95,7 @@ module Minitest::Assertions
   def refute_empty(obj, msg = T.unsafe(nil)); end
   def refute_equal(exp, act, msg = T.unsafe(nil)); end
   def refute_in_delta(exp, act, delta = T.unsafe(nil), msg = T.unsafe(nil)); end
-  def refute_in_epsilon(a, b, epsilon = T.unsafe(nil), msg = T.unsafe(nil)); end
+  def refute_in_epsilon(exp, act, epsilon = T.unsafe(nil), msg = T.unsafe(nil)); end
   def refute_includes(collection, obj, msg = T.unsafe(nil)); end
   def refute_instance_of(cls, obj, msg = T.unsafe(nil)); end
   def refute_kind_of(cls, obj, msg = T.unsafe(nil)); end

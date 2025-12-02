@@ -49,6 +49,8 @@ module DRb
   end
 end
 
+DRb::DRB_OBJECT_SPACE = T.let(T.unsafe(nil), DRb::DRbObjectSpace)
+
 class DRb::DRbArray
   def initialize(ary); end
 
@@ -117,6 +119,15 @@ class DRb::DRbObject
   end
 end
 
+class DRb::DRbObjectSpace
+  include ::MonitorMixin
+
+  def initialize; end
+
+  def to_id(obj); end
+  def to_obj(ref); end
+end
+
 module DRb::DRbProtocol
   private
 
@@ -178,23 +189,18 @@ class DRb::DRbServer
 end
 
 class DRb::DRbServer::InvokeMethod
-  include ::DRb::DRbServer::InvokeMethod18Mixin
-
   def initialize(drb_server, client); end
 
   def perform; end
 
   private
 
+  def block_yield(x); end
   def check_insecure_method; end
   def init_with_client; end
+  def perform_with_block; end
   def perform_without_block; end
   def setup_message; end
-end
-
-module DRb::DRbServer::InvokeMethod18Mixin
-  def block_yield(x); end
-  def perform_with_block; end
 end
 
 class DRb::DRbTCPSocket

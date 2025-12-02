@@ -1,5 +1,7 @@
-inherit_gem:
-  rubocop-shopify: rubocop.yml
+inherit_mode:
+  merge:
+  - Exclude
+  - Include
 
 plugins:
   - rubocop-angellist
@@ -13,7 +15,7 @@ plugins:
 
 AllCops:
   TargetRailsVersion: 7.0
-  TargetRubyVersion: 3.3
+  TargetRubyVersion: 3.4
   Exclude:
     - app/views/**/* # Dont think this is necessary but… whatever
     - bin/**/*
@@ -32,6 +34,13 @@ Angellist:
 
 # Add Rubocop rules we want to override below, sort them alphabetically
 
+Bundler/OrderedGems: { Enabled: false }
+
+Gemspec/DeprecatedAttributeAssignment: { Enabled: true }
+Gemspec/DevelopmentDependencies: { Enabled: false }
+Gemspec/RequireMFA: { Enabled: false }
+Gemspec/RequiredRubyVersion: { Enabled: false }
+
 GraphQL/ArgumentDescription: { Enabled: false }
 GraphQL/ArgumentName: { Enabled: false }
 GraphQL/ExtractType: { Enabled: false }
@@ -40,22 +49,139 @@ GraphQL/FieldName: { Enabled: false }
 GraphQL/FieldMethod: { Enabled: true, AutoCorrect: false }
 GraphQL/ObjectDescription: { Enabled: false }
 
-Lint/AssignmentInCondition: { Enabled: true, AllowSafeAssignment: false }
-Lint/SafeNavigationChain:
-  Enabled: true
-  AllowedMethods: ['present?', 'blank?', 'presence', 'try', 'in?', 'to_money', 'to_d', 'nil?']
-
+Layout/ArgumentAlignment: { EnforcedStyle: with_fixed_indentation }
 # Layout/ClassStructure is replaced by Angellist/ClassStructure
-Layout/ClassStructure:
-  Enabled: false
-
+Layout/ClassStructure: { Enabled: false }
+Layout/CaseIndentation: { EnforcedStyle: end }
 Layout/EmptyLineAfterGuardClause: { Enabled: true }
+Layout/EndAlignment: { EnforcedStyleAlignWith: variable }
+Layout/FirstArgumentIndentation: { EnforcedStyle: consistent }
+Layout/FirstArrayElementIndentation: { EnforcedStyle: consistent }
+Layout/FirstArrayElementLineBreak: { Enabled: true, AllowMultilineFinalElement: true }
+Layout/FirstHashElementIndentation: { EnforcedStyle: consistent }
+Layout/FirstHashElementLineBreak: { Enabled: true }
+Layout/FirstMethodArgumentLineBreak: { Enabled: true, AllowMultilineFinalElement: true }
+Layout/HashAlignment: { EnforcedLastArgumentHashStyle: ignore_implicit }
+Layout/LineContinuationLeadingSpace: { Enabled: false }
+Layout/LineContinuationSpacing: { Enabled: false }
+Layout/LineEndStringConcatenationIndentation: { Enabled: true, EnforcedStyle: indented }
 Layout/LineLength: { Enabled: false }
+Layout/MultilineArrayLineBreaks: { Enabled: true, AllowMultilineFinalElement: true }
+Layout/MultilineHashKeyLineBreaks: { Enabled: true }
+Layout/MultilineMethodArgumentLineBreaks: { Enabled: true, AllowMultilineFinalElement: true }
+Layout/MultilineMethodCallIndentation: { EnforcedStyle: indented, IndentationWidth: 2 }
+Layout/MultilineOperationIndentation: { EnforcedStyle: indented }
+Layout/ParameterAlignment: { EnforcedStyle: with_fixed_indentation }
+Layout/SpaceBeforeBrackets: { Enabled: true }
 Layout/SpaceInsideBlockBraces: { Enabled: true, }
 Layout/TrailingEmptyLines: { Enabled: true, EnforcedStyle: final_newline }
 
+Lint/AmbiguousAssignment: { Enabled: false }
+Lint/AmbiguousBlockAssociation: { Enabled: false }
+Lint/AmbiguousOperatorPrecedence: { Enabled: false }
+Lint/AmbiguousRange: { Enabled: false }
+Lint/AssignmentInCondition: { Enabled: true, AllowSafeAssignment: false }
+Lint/BooleanSymbol: { Enabled: false }
+Lint/ConstantDefinitionInBlock: { Enabled: false }
+Lint/ConstantOverwrittenInRescue: { Enabled: true }
+Lint/DeprecatedConstants: { Enabled: false }
+Lint/DisjunctiveAssignmentInConstructor: { Enabled: false }
+Lint/DuplicateBranch: { Enabled: false }
+Lint/DuplicateCaseCondition: { Enabled: false }
+Lint/DuplicateElsifCondition: { Enabled: false }
+Lint/DuplicateMagicComment: { Enabled: true }
+Lint/DuplicateMatchPattern: { Enabled: true }
+Lint/DuplicateRegexpCharacterClassElement: { Enabled: false }
+Lint/DuplicateRequire: { Enabled: false }
+Lint/DuplicateRescueException: { Enabled: false }
+Lint/EmptyBlock: { Enabled: false }
+Lint/EmptyClass: { Enabled: false }
+Lint/EmptyConditionalBody: { Enabled: false }
+Lint/EmptyExpression: { Enabled: false }
+Lint/EmptyFile: { Enabled: false }
+Lint/EmptyInPattern: { Enabled: false }
+Lint/EmptyWhen: { Enabled: false }
+Lint/ErbNewArguments: { Enabled: false }
+Lint/FloatComparison: { Enabled: false }
+Lint/HashCompareByIdentity: { Enabled: false }
+Lint/IdentityComparison: { Enabled: false }
+Lint/IncompatibleIoSelectWithFiberScheduler: { Enabled: false }
+Lint/InterpolationCheck: { Enabled: false }
+Lint/LambdaWithoutLiteralBlock: { Enabled: false }
+Lint/MixedRegexpCaptureTypes: { Enabled: false }
+Lint/MultipleComparison: { Enabled: false }
+Lint/NestedPercentLiteral: { Enabled: false }
+Lint/NoReturnInBeginEndBlocks: { Enabled: true }
+Lint/NonAtomicFileOperation: { Enabled: false }
+Lint/NonDeterministicRequireOrder: { Enabled: false }
+Lint/NumberedParameterAssignment: { Enabled: false }
+Lint/OrAssignmentToConstant: { Enabled: false }
+Lint/OutOfRangeRegexpRef: { Enabled: false }
+Lint/RaiseException: { Enabled: false }
+Lint/RedundantDirGlobSort: { Enabled: false }
+Lint/RedundantRequireStatement: { Enabled: false }
+Lint/RedundantSafeNavigation: { Enabled: false }
+Lint/RedundantWithIndex: { Enabled: false }
+Lint/RedundantWithObject: { Enabled: false }
+Lint/RefinementImportMethods: { Enabled: false }
+Lint/RegexpAsCondition: { Enabled: false }
+Lint/RequireRangeParentheses: { Enabled: true }
+Lint/RequireRelativeSelfPath: { Enabled: true }
+Lint/RescueType: { Enabled: false }
+Lint/ReturnInVoidContext: { Enabled: false }
+Lint/SafeNavigationChain:
+  Enabled: true
+  AllowedMethods: ['present?', 'blank?', 'presence', 'try', 'in?', 'to_money', 'to_d', 'nil?']
+Lint/SafeNavigationConsistency: { Enabled: false }
+Lint/SafeNavigationWithEmpty: { Enabled: false }
+Lint/ScriptPermission: { Enabled: false }
+Lint/SelfAssignment: { Enabled: false }
+Lint/SendWithMixinArgument: { Enabled: false }
+Lint/ShadowedArgument: { Enabled: false }
+Lint/ShadowingOuterLocalVariable: { Enabled: false }
+Lint/StructNewOverride: { Enabled: false }
+Lint/SymbolConversion: { Enabled: false }
+Lint/ToEnumArguments: { Enabled: false }
+Lint/ToJSON: { Enabled: false }
+Lint/TopLevelReturnWithArgument: { Enabled: false }
+Lint/TrailingCommaInAttributeDeclaration: { Enabled: false }
+Lint/TripleQuotes: { Enabled: false }
+Lint/UnexpectedBlockArity: { Enabled: false }
+Lint/UnmodifiedReduceAccumulator: { Enabled: false }
+Lint/UnreachableLoop: { Enabled: false }
+Lint/UnusedMethodArgument: { Enabled: false }
+Lint/UriEscapeUnescape: { Enabled: false }
+Lint/UriRegexp: { Enabled: false }
+Lint/UselessMethodDefinition: { Enabled: false }
+Lint/UselessRescue: { Enabled: true }
+Lint/UselessRuby2Keywords: { Enabled: true }
+Lint/UselessTimes: { Enabled: false }
+
+Migration/DepartmentName: { Enabled: false }
+
+Metrics/AbcSize: { Enabled: false }
+Metrics/BlockLength: { Enabled: false }
+Metrics/ClassLength: { Enabled: false }
+Metrics/CollectionLiteralLength: { Enabled: true }
+Metrics/CyclomaticComplexity: { Enabled: false }
+Metrics/MethodLength: { Enabled: false }
+Metrics/ModuleLength: { Enabled: false }
+Metrics/ParameterLists: { CountKeywordArgs: false }
+Metrics/PerceivedComplexity: { Enabled: false }
+
+Naming/BlockForwarding: { Enabled: false }
+Naming/BlockParameterName: { Enabled: false }
+Naming/HeredocDelimiterCase: { Enabled: false }
+Naming/HeredocDelimiterNaming: { Enabled: false }
 Naming/InclusiveLanguage: { Enabled: false }
-Naming/PredicatePrefix: { Enabled: false }
+Naming/MemoizedInstanceVariableName: { Enabled: false }
+Naming/MethodName:
+  AllowedPatterns:
+    - '\Atest_'
+Naming/MethodParameterName: { Enabled: false }
+Naming/PredicatePrefix: { Enabled: true }
+Naming/RescuedExceptionsVariableName: { Enabled: false }
+Naming/VariableNumber: { Enabled: false }
 
 Rails/Delegate: { Enabled: false }
 
@@ -66,28 +192,159 @@ RSpec/MultipleExpectations: { Enabled: false }
 RSpec/StubbedMock: { Enabled: false }
 RSpec/SpecFilePathSuffix: { Severity: error }
 
+Security/CompoundHash: { Enabled: false }
+Security/IoMethods: { Enabled: true }
+Security/MarshalLoad: { Enabled: false }
+Security/YAMLLoad: { Enabled: false }
+
 Sorbet/EnforceSigilOrder: { Enabled: false }
 Sorbet/FalseSigil: { Enabled: false }
 Sorbet/HasSigil:
   Enabled: true
   SuggestedStrictness: 'strict'
   MinimumStrictness: 'true'
-
+Style/AccessModifierDeclarations: { Enabled: false }
+Style/AccessorGrouping: { Enabled: false }
+Style/Alias: { EnforcedStyle: prefer_alias_method }
+Style/ArgumentsForwarding: { Enabled: false }
+Style/ArrayIntersect: { Enabled: true }
+Style/BisectedAttrAccessor: { Enabled: false }
 Style/BlockDelimiters: { Enabled: true }
+Style/CaseEquality: { AllowOnConstant: true, AllowOnSelfClass: true }
+Style/CaseLikeIf: { Enabled: false }
+Style/ClassAndModuleChildren: { Enabled: true, EnforcedStyle: compact }
+Style/ClassEqualityComparison: { Enabled: false }
+Style/ClassMethodsDefinitions: { EnforcedStyle: self_class, Enabled: true }
+Style/CollectionCompact: { Enabled: false }
+Style/ColonMethodDefinition: { Enabled: false }
+Style/CombinableLoops: { Enabled: false }
+Style/CommandLiteral: { EnforcedStyle: percent_x }
 Style/CommentAnnotation: { Enabled: false }
+Style/CommentedKeyword: { Enabled: false }
+Style/ComparableClamp: { Enabled: true }
+Style/ConcatArrayLiterals: { Enabled: true }
+Style/DataInheritance: { Enabled: true }
 Style/DateTime: { Enabled: true, AllowCoercion: false }
+Style/Dir: { Enabled: false }
+Style/DirEmpty: { Enabled: true }
+Style/DocumentDynamicEvalDefinition: { Enabled: false }
+Style/Documentation: { Enabled: false }
+Style/DoubleCopDisableDirective: { Enabled: false }
+Style/DoubleNegation: { Enabled: false }
+Style/EmptyBlockParameter: { Enabled: false }
+Style/EmptyHeredoc: { Enabled: true }
+Style/EmptyLambdaParameter: { Enabled: false }
+Style/EmptyMethod: { Enabled: false }
+Style/Encoding: { Enabled: false }
+Style/EndlessMethod: { Enabled: false }
+Style/EnvHome: { Enabled: false }
+Style/EvalWithLocation: { Enabled: false }
+Style/ExactRegexpMatch: { Enabled: true }
+Style/ExpandPathArguments: { Enabled: false }
+Style/ExponentialNotation: { Enabled: false }
+Style/FetchEnvVar: { Enabled: false }
+Style/FileEmpty: { Enabled: true }
+Style/FileRead: { Enabled: false }
+Style/FileWrite: { Enabled: false }
+Style/FloatDivision: { Enabled: false }
+Style/FormatStringToken: { Enabled: false }
+Style/FrozenStringLiteralComment:
+  SafeAutoCorrect: true
+  Details: 'Add `# frozen_string_literal: true` to the top of the file. Frozen string
+    literals will become the default in a future Ruby version, and we want to make
+    sure we''re ready.'
 Style/GuardClause: { Enabled: true }
+Style/HashAsLastArrayItem: { Enabled: false }
+Style/HashConversion: { Enabled: false }
+Style/HashEachMethods: { Enabled: false }
+Style/HashExcept: { Enabled: false }
+Style/HashLikeCase: { Enabled: false }
+Style/HashSyntax: { Enabled: true, EnforcedShorthandSyntax: never }
+Style/HashTransformKeys: { Enabled: false }
+Style/HashTransformValues: { Enabled: false }
+Style/IfUnlessModifier: { Enabled: false }
+Style/IfWithBooleanLiteralBranches: { Enabled: false }
+Style/InPatternThen: { Enabled: true }
 Style/InverseMethods: { Enabled: true, Safe: true }
 Style/InvertibleUnlessCondition: { Enabled: false }
+Style/KeywordParametersOrder: { Enabled: false }
+Style/Lambda: { Enabled: false }
+Style/MagicCommentFormat: { Enabled: true, ValueCapitalization: lowercase }
+Style/MapCompactWithConditionalBlock: { Enabled: false }
+Style/MapToHash: { Enabled: false }
+Style/MapToSet: { Enabled: false }
 Style/MethodCallWithArgsParentheses: { Enabled: false }
+Style/MinMax: { Enabled: false }
+Style/MinMaxComparison: { Enabled: true }
+Style/MixinGrouping: { Enabled: false }
+Style/MixinUsage: { Enabled: false }
+Style/ModuleFunction: { EnforcedStyle: extend_self }
+Style/MultilineBlockChain: { Enabled: false }
+Style/MultilineIfModifier: { Enabled: false }
+Style/MultilineInPatternThen: { Enabled: false }
+Style/MultilineWhenThen: { Enabled: false }
+Style/MultipleComparison: { Enabled: false }
+Style/MutableConstant: { Enabled: false }
 Style/NegatedIf: { Enabled: false }
-Style/ClassAndModuleChildren: { Enabled: true, EnforcedStyle: compact }
-Style/OpenStructUse: { Enabled: false }
+Style/NegatedIfElseCondition: { Enabled: false }
+Style/NegatedUnless: { Enabled: false }
+Style/NestedFileDirname: { Enabled: true }
+Style/NilLambda: { Enabled: false }
+Style/NumberedParameters: { Enabled: false }
+Style/NumberedParametersLimit: { Enabled: false }
+Style/NumericLiterals: { Enabled: false }
+Style/NumericPredicate: { Enabled: false }
+Style/ObjectThen: { Enabled: false }
+Style/OpenStructUse: { Enabled: true }
+Style/OperatorMethodCall: { Enabled: true }
+Style/OptionalBooleanParameter: { Enabled: false }
+Style/OrAssignment: { Enabled: false }
+Style/PercentLiteralDelimiters: { Enabled: false }
+Style/QuotedSymbols: { Enabled: true }
+Style/RandomWithOffset: { Enabled: false }
+Style/RedundantArgument: { Enabled: false }
+Style/RedundantAssignment: { Enabled: false }
+Style/RedundantCondition: { Enabled: false }
+Style/RedundantConditional: { Enabled: false }
+Style/RedundantConstantBase: { Enabled: true }
+Style/RedundantDoubleSplatHashBraces: { Enabled: true }
+Style/RedundantEach: { Enabled: true }
+Style/RedundantFetchBlock: { Enabled: false }
+Style/RedundantFileExtensionInRequire: { Enabled: false }
+Style/RedundantHeredocDelimiterQuotes: { Enabled: true }
+Style/RedundantInitialize: { Enabled: false }
+Style/RedundantLineContinuation: { Enabled: true }
+Style/RedundantRegexpCharacterClass: { Enabled: false }
+Style/RedundantRegexpEscape: { Enabled: false }
+Style/RedundantSelfAssignment: { Enabled: false }
+Style/RedundantSelfAssignmentBranch: { Enabled: false }
+Style/RedundantSort: { Enabled: false }
+Style/RedundantStringEscape: { Enabled: true }
+Style/RegexpLiteral: { EnforcedStyle: mixed }
+Style/RescueStandardError: { Enabled: false }
+Style/ReturnNil: { Enabled: true }
 Style/SafeNavigation: { Enabled: false }
+Style/SelectByRegexp: { Enabled: false }
+Style/SingleArgumentDig: { Enabled: false }
+Style/SlicingWithRange: { Enabled: false }
+Style/SoleNestedConditional: { Enabled: false }
+Style/StderrPuts: { Enabled: false }
+Style/StringChars: { Enabled: false }
+Style/StringConcatenation: { Enabled: false }
 Style/StringLiterals: { Enabled: true, EnforcedStyle: single_quotes }
 Style/StringLiteralsInInterpolation: { Enabled: true, EnforcedStyle: single_quotes }
+Style/StructInheritance: { Enabled: false }
+Style/SwapValues: { Enabled: false }
+Style/SymbolArray: { EnforcedStyle: brackets }
+Style/TrailingBodyOnMethodDefinition: { Enabled: false }
 Style/TrailingCommaInArguments: { Enabled: true, EnforcedStyleForMultiline: consistent_comma }
+Style/TrailingCommaInArrayLiteral: { EnforcedStyleForMultiline: consistent_comma }
 Style/TrailingCommaInBlockArgs: { Enabled: true }
+Style/TrailingCommaInHashLiteral: { EnforcedStyleForMultiline: consistent_comma }
+Style/TrailingMethodEndStatement: { Enabled: false }
+Style/TrailingUnderscoreVariable: { Enabled: false }
 Style/TrivialAccessors: { Enabled: false }
+Style/UnpackFirst: { Enabled: false }
 Style/WhileUntilModifier: { Enabled: false }
 Style/WordArray: { Enabled: false }
+Style/YodaCondition: { Enabled: false }

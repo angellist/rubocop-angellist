@@ -394,6 +394,10 @@ class Regexp::Expression::EscapeSequence::Tab < ::Regexp::Expression::EscapeSequ
   def codepoint; end
 end
 
+class Regexp::Expression::EscapeSequence::UTF8Hex < ::Regexp::Expression::EscapeSequence::Base
+  def codepoint; end
+end
+
 class Regexp::Expression::EscapeSequence::VerticalTab < ::Regexp::Expression::EscapeSequence::Base
   def codepoint; end
 end
@@ -938,6 +942,8 @@ end
 Regexp::Parser::VERSION = T.let(T.unsafe(nil), String)
 
 class Regexp::Scanner
+  def capturing_group_count; end
+  def capturing_group_count=(_arg0); end
   def emit(type, token, text); end
   def literal_run; end
   def literal_run=(_arg0); end
@@ -958,6 +964,7 @@ class Regexp::Scanner
   def emit_literal; end
   def emit_meta_control_sequence(data, ts, te, token); end
   def emit_options(text); end
+  def extract_encoding(input_object, options); end
   def free_spacing; end
   def free_spacing=(_arg0); end
   def free_spacing?(input_object, options); end
@@ -967,6 +974,8 @@ class Regexp::Scanner
   def in_set?; end
   def prev_token; end
   def prev_token=(_arg0); end
+  def regexp_encoding; end
+  def regexp_encoding=(_arg0); end
   def set_depth; end
   def set_depth=(_arg0); end
   def spacing_stack; end
@@ -977,7 +986,6 @@ class Regexp::Scanner
   class << self
     def long_prop_map; end
     def parse_prop_map(name); end
-    def posix_classes; end
     def scan(input_object, options: T.unsafe(nil), collect_tokens: T.unsafe(nil), &block); end
     def short_prop_map; end
   end
@@ -998,6 +1006,8 @@ end
 class Regexp::Scanner::InvalidSequenceError < ::Regexp::Scanner::ValidationError
   def initialize(what = T.unsafe(nil), where = T.unsafe(nil)); end
 end
+
+Regexp::Scanner::POSIX_CLASSES = T.let(T.unsafe(nil), Hash)
 
 class Regexp::Scanner::PrematureEndError < ::Regexp::Scanner::ScannerError
   def initialize(where = T.unsafe(nil)); end
@@ -1213,6 +1223,7 @@ Regexp::Syntax::Token::UnicodeProperty::Age_V2_6_2 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::Age_V2_6_3 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::Age_V3_1_0 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::Age_V3_2_0 = T.let(T.unsafe(nil), Array)
+Regexp::Syntax::Token::UnicodeProperty::Age_V3_5_0 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::All = T.let(T.unsafe(nil), Array)
 module Regexp::Syntax::Token::UnicodeProperty::Category; end
 Regexp::Syntax::Token::UnicodeProperty::Category::All = T.let(T.unsafe(nil), Array)
@@ -1230,6 +1241,7 @@ Regexp::Syntax::Token::UnicodeProperty::Derived_V1_9_0 = T.let(T.unsafe(nil), Ar
 Regexp::Syntax::Token::UnicodeProperty::Derived_V2_0_0 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::Derived_V2_4_0 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::Derived_V2_5_0 = T.let(T.unsafe(nil), Array)
+Regexp::Syntax::Token::UnicodeProperty::Derived_V3_5_0 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::Emoji = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::Emoji_V2_5_0 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::Emoji_V2_6_0 = T.let(T.unsafe(nil), Array)
@@ -1261,6 +1273,7 @@ Regexp::Syntax::Token::UnicodeProperty::UnicodeBlock_V2_6_0 = T.let(T.unsafe(nil
 Regexp::Syntax::Token::UnicodeProperty::UnicodeBlock_V2_6_2 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::UnicodeBlock_V3_1_0 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::UnicodeBlock_V3_2_0 = T.let(T.unsafe(nil), Array)
+Regexp::Syntax::Token::UnicodeProperty::UnicodeBlock_V3_5_0 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::V1_9_0 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::V1_9_3 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::V2_0_0 = T.let(T.unsafe(nil), Array)
@@ -1273,6 +1286,7 @@ Regexp::Syntax::Token::UnicodeProperty::V2_6_2 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::V2_6_3 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::V3_1_0 = T.let(T.unsafe(nil), Array)
 Regexp::Syntax::Token::UnicodeProperty::V3_2_0 = T.let(T.unsafe(nil), Array)
+Regexp::Syntax::Token::UnicodeProperty::V3_5_0 = T.let(T.unsafe(nil), Array)
 
 class Regexp::Syntax::UnknownSyntaxNameError < ::Regexp::Syntax::SyntaxError
   def initialize(name); end
@@ -1292,6 +1306,7 @@ class Regexp::Syntax::V2_6_2 < ::Regexp::Syntax::V2_6_0; end
 class Regexp::Syntax::V2_6_3 < ::Regexp::Syntax::V2_6_2; end
 class Regexp::Syntax::V3_1_0 < ::Regexp::Syntax::V2_6_3; end
 class Regexp::Syntax::V3_2_0 < ::Regexp::Syntax::V3_1_0; end
+class Regexp::Syntax::V3_5_0 < ::Regexp::Syntax::V3_2_0; end
 Regexp::Syntax::VERSION_CONST_REGEXP = T.let(T.unsafe(nil), Regexp)
 Regexp::Syntax::VERSION_FORMAT = T.let(T.unsafe(nil), String)
 Regexp::Syntax::VERSION_REGEXP = T.let(T.unsafe(nil), Regexp)

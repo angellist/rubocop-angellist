@@ -24,6 +24,7 @@ class Erubi::Engine
 
   private
 
+  def _dup_string_if_frozen(string); end
   def add_code(code); end
   def add_expression(indicator, code); end
   def add_expression_result(code); end

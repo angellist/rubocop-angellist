@@ -215,6 +215,7 @@ module RuboCop::AST::CollectionNode
   def empty?(*_arg0, **_arg1, &_arg2); end
   def entries(*_arg0, **_arg1, &_arg2); end
   def fetch(*_arg0, **_arg1, &_arg2); end
+  def fetch_values(*_arg0, **_arg1, &_arg2); end
   def fill(*_arg0, **_arg1, &_arg2); end
   def filter(*_arg0, **_arg1, &_arg2); end
   def filter!(*_arg0, **_arg1, &_arg2); end
@@ -307,6 +308,11 @@ module RuboCop::AST::CollectionNode
 end
 
 RuboCop::AST::CollectionNode::ARRAY_METHODS = T.let(T.unsafe(nil), Array)
+
+class RuboCop::AST::ComplexNode < ::RuboCop::AST::Node
+  include ::RuboCop::AST::BasicLiteralNode
+  include ::RuboCop::AST::NumericNode
+end
 
 module RuboCop::AST::ConditionalNode
   def body; end
@@ -662,6 +668,9 @@ class RuboCop::AST::Node < ::Parser::AST::Node
   def and_type?; end
   def any_block_type?; end
   def any_def_type?; end
+  def any_match_pattern_type?; end
+  def any_str_type?; end
+  def any_sym_type?; end
   def arg_expr_type?; end
   def arg_type?; end
   def args_type?; end
@@ -1467,6 +1476,7 @@ RuboCop::AST::NodePattern::Sets::SET_ADD_DEPENDENCY_ADD_RUNTIME_DEPENDENCY_ADD_D
 RuboCop::AST::NodePattern::Sets::SET_ALL_CONTEXT = T.let(T.unsafe(nil), Set)
 RuboCop::AST::NodePattern::Sets::SET_AND_RETURN_AND_RAISE_AND_THROW_ETC = T.let(T.unsafe(nil), Set)
 RuboCop::AST::NodePattern::Sets::SET_ANY_EMPTY_NONE_ETC = T.let(T.unsafe(nil), Set)
+RuboCop::AST::NodePattern::Sets::SET_ANY_NONE = T.let(T.unsafe(nil), Set)
 RuboCop::AST::NodePattern::Sets::SET_ARRAY_HASH = T.let(T.unsafe(nil), Set)
 RuboCop::AST::NodePattern::Sets::SET_ATTR_READER_ATTR_WRITER_ATTR_ACCESSOR_ATTR = T.let(T.unsafe(nil), Set)
 RuboCop::AST::NodePattern::Sets::SET_BE_EQ_EQL_EQUAL = T.let(T.unsafe(nil), Set)
@@ -2071,137 +2081,9 @@ class RuboCop::AST::YieldNode < ::RuboCop::AST::Node
   def node_parts; end
 end
 
-class RuboCop::CommentConfig
-  def initialize(processed_source); end
-
-  def comment_only_line?(line_number); end
-  def config(*_arg0, **_arg1, &_arg2); end
-  def cop_disabled_line_ranges; end
-  def cop_enabled_at_line?(cop, line_number); end
-  def cop_opted_in?(cop); end
-  def extra_enabled_comments; end
-  def processed_source; end
-  def registry(*_arg0, **_arg1, &_arg2); end
-
-  private
-
-  def analyze; end
-  def analyze_cop(analysis, directive); end
-  def analyze_disabled(analysis, directive); end
-  def analyze_rest(analysis, directive); end
-  def analyze_single_line(analysis, directive); end
-  def cop_line_ranges(analysis); end
-  def each_directive; end
-  def extra_enabled_comments_with_names(extras:, names:); end
-  def handle_enable_all(directive, names, extras); end
-  def handle_switch(directive, names, extras); end
-  def inject_disabled_cops_directives(analyses); end
-  def non_comment_token_line_numbers; end
-  def opt_in_cops; end
-  def qualified_cop_name(cop_name); end
-end
-
-class RuboCop::Config
-  def initialize(hash = T.unsafe(nil), loaded_path = T.unsafe(nil)); end
-
-  def [](*_arg0, **_arg1, &_arg2); end
-  def []=(*_arg0, **_arg1, &_arg2); end
-  def active_support_extensions_enabled?; end
-  def add_excludes_from_higher_level(highest_config); end
-  def allowed_camel_case_file?(file); end
-  def base_dir_for_path_parameters; end
-  def bundler_lock_file_path; end
-  def check; end
-  def clusivity_config_for_badge?(badge); end
-  def cop_enabled?(name); end
-  def delete(*_arg0, **_arg1, &_arg2); end
-  def deprecation_check; end
-  def dig(*_arg0, **_arg1, &_arg2); end
-  def disabled_new_cops?; end
-  def each(*_arg0, **_arg1, &_arg2); end
-  def each_key(*_arg0, **_arg1, &_arg2); end
-  def enabled_new_cops?; end
-  def fetch(*_arg0, **_arg1, &_arg2); end
-  def file_to_exclude?(file); end
-  def file_to_include?(file); end
-  def for_all_cops; end
-  def for_badge(badge); end
-  def for_cop(cop); end
-  def for_department(department_name); end
-  def for_enabled_cop(cop); end
-  def gem_versions_in_target; end
-  def inspect; end
-  def internal?; end
-  def key?(*_arg0, **_arg1, &_arg2); end
-  def keys(*_arg0, **_arg1, &_arg2); end
-  def loaded_features; end
-  def loaded_path; end
-  def loaded_plugins; end
-  def make_excludes_absolute; end
-  def map(*_arg0, **_arg1, &_arg2); end
-  def merge(*_arg0, **_arg1, &_arg2); end
-  def parser_engine; end
-  def path_relative_to_config(path); end
-  def patterns_to_exclude; end
-  def patterns_to_include; end
-  def pending_cops; end
-  def possibly_include_hidden?; end
-  def replace(*_arg0, **_arg1, &_arg2); end
-  def signature; end
-  def smart_loaded_path; end
-  def string_literals_frozen_by_default?; end
-  def target_rails_version; end
-  def target_ruby_version(*_arg0, **_arg1, &_arg2); end
-  def to_h(*_arg0, **_arg1, &_arg2); end
-  def to_hash(*_arg0, **_arg1, &_arg2); end
-  def to_s; end
-  def transform_values(*_arg0, **_arg1, &_arg2); end
-  def validate(*_arg0, **_arg1, &_arg2); end
-  def validate_after_resolution; end
-
-  private
-
-  def department_of(qualified_cop_name); end
-  def enable_cop?(qualified_cop_name, cop_options); end
-  def gem_version_to_major_minor_float(gem_version); end
-  def read_gem_versions_from_target_lockfile; end
-  def read_rails_version_from_bundler_lock_file; end
-  def target_rails_version_from_bundler_lock_file; end
-
-  class << self
-    def create(hash, path, check: T.unsafe(nil)); end
-  end
-end
-
-class RuboCop::ConfigValidator
-  def initialize(config); end
-
-  def for_all_cops(*_arg0, **_arg1, &_arg2); end
-  def smart_loaded_path(*_arg0, **_arg1, &_arg2); end
-  def target_ruby_version; end
-  def validate; end
-  def validate_after_resolution; end
-
-  private
-
-  def alert_about_unrecognized_cops(invalid_cop_names); end
-  def check_cop_config_value(hash, parent = T.unsafe(nil)); end
-  def check_obsoletions; end
-  def check_target_ruby; end
-  def each_invalid_parameter(cop_name); end
-  def list_unknown_cops(invalid_cop_names); end
-  def param_error_message(parent, key, value, supposed_values); end
-  def reject_conflicting_safe_settings; end
-  def reject_mutually_exclusive_defaults; end
-  def suggestion(name); end
-  def target_ruby; end
-  def validate_enforced_styles(valid_cop_names); end
-  def validate_new_cops_parameter; end
-  def validate_parameter_names(valid_cop_names); end
-  def validate_parameter_shape(valid_cop_names); end
-  def validate_support_and_has_list(name, formats, valid); end
-  def validate_syntax_cop; end
-end
+class RuboCop::CommentConfig; end
+class RuboCop::Config; end
+class RuboCop::ConfigValidator; end
 
 module RuboCop::SimpleForwardable
   def def_delegators(accessor, *methods); end

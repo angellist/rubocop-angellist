@@ -133,11 +133,11 @@ class ActiveSupport::BroadcastLogger
 
   def initialize(*loggers); end
 
-  def <<(message); end
+  def <<(*_arg0, **_arg1, &_arg2); end
   def add(*_arg0, **_arg1, &_arg2); end
   def broadcast_to(*loggers); end
   def broadcasts; end
-  def close; end
+  def close(*_arg0, **_arg1, &_arg2); end
   def debug(*_arg0, **_arg1, &_arg2); end
   def debug!; end
   def debug?; end
@@ -147,18 +147,19 @@ class ActiveSupport::BroadcastLogger
   def fatal(*_arg0, **_arg1, &_arg2); end
   def fatal!; end
   def fatal?; end
-  def formatter; end
-  def formatter=(formatter); end
+  def formatter(*_arg0, **_arg1, &_arg2); end
+  def formatter=(*_arg0, **_arg1, &_arg2); end
   def info(*_arg0, **_arg1, &_arg2); end
   def info!; end
   def info?; end
   def level; end
-  def level=(level); end
+  def level=(*_arg0, **_arg1, &_arg2); end
+  def local_level; end
   def local_level=(level); end
   def log(*_arg0, **_arg1, &_arg2); end
   def progname; end
   def progname=(_arg0); end
-  def sev_threshold=(level); end
+  def sev_threshold=(*_arg0, **_arg1, &_arg2); end
   def silencer; end
   def silencer=(val); end
   def stop_broadcasting_to(logger); end
@@ -169,7 +170,7 @@ class ActiveSupport::BroadcastLogger
 
   private
 
-  def dispatch(&block); end
+  def dispatch(method, *args, **kwargs, &block); end
   def initialize_copy(other); end
   def method_missing(name, *_arg1, **_arg2, &_arg3); end
   def respond_to_missing?(method, include_all); end
@@ -179,6 +180,8 @@ class ActiveSupport::BroadcastLogger
     def silencer=(val); end
   end
 end
+
+ActiveSupport::BroadcastLogger::LOGGER_METHODS = T.let(T.unsafe(nil), Array)
 
 module ActiveSupport::Cache
   class << self
@@ -271,9 +274,9 @@ class ActiveSupport::Cache::FileStore < ::ActiveSupport::Cache::Store
   def cache_path; end
   def cleanup(options = T.unsafe(nil)); end
   def clear(options = T.unsafe(nil)); end
-  def decrement(name, amount = T.unsafe(nil), options = T.unsafe(nil)); end
+  def decrement(name, amount = T.unsafe(nil), **options); end
   def delete_matched(matcher, options = T.unsafe(nil)); end
-  def increment(name, amount = T.unsafe(nil), options = T.unsafe(nil)); end
+  def increment(name, amount = T.unsafe(nil), **options); end
   def inspect; end
 
   private
@@ -306,9 +309,9 @@ class ActiveSupport::Cache::MemoryStore < ::ActiveSupport::Cache::Store
 
   def cleanup(options = T.unsafe(nil)); end
   def clear(options = T.unsafe(nil)); end
-  def decrement(name, amount = T.unsafe(nil), options = T.unsafe(nil)); end
+  def decrement(name, amount = T.unsafe(nil), **options); end
   def delete_matched(matcher, options = T.unsafe(nil)); end
-  def increment(name, amount = T.unsafe(nil), options = T.unsafe(nil)); end
+  def increment(name, amount = T.unsafe(nil), **options); end
   def inspect; end
   def prune(target_size, max_time = T.unsafe(nil)); end
   def pruning?; end
@@ -318,7 +321,7 @@ class ActiveSupport::Cache::MemoryStore < ::ActiveSupport::Cache::Store
 
   def cached_size(key, payload); end
   def delete_entry(key, **options); end
-  def modify_value(name, amount, options); end
+  def modify_value(name, amount, **options); end
   def read_entry(key, **options); end
   def write_entry(key, entry, **options); end
 
@@ -348,9 +351,9 @@ class ActiveSupport::Cache::NullStore < ::ActiveSupport::Cache::Store
 
   def cleanup(options = T.unsafe(nil)); end
   def clear(options = T.unsafe(nil)); end
-  def decrement(name, amount = T.unsafe(nil), options = T.unsafe(nil)); end
+  def decrement(name, amount = T.unsafe(nil), **options); end
   def delete_matched(matcher, options = T.unsafe(nil)); end
-  def increment(name, amount = T.unsafe(nil), options = T.unsafe(nil)); end
+  def increment(name, amount = T.unsafe(nil), **options); end
   def inspect; end
 
   private
@@ -506,9 +509,10 @@ module ActiveSupport::Cache::Strategy; end
 module ActiveSupport::Cache::Strategy::LocalCache
   def cleanup(options = T.unsafe(nil)); end
   def clear(options = T.unsafe(nil)); end
-  def decrement(name, amount = T.unsafe(nil), options = T.unsafe(nil)); end
+  def decrement(name, amount = T.unsafe(nil), **options); end
   def delete_matched(matcher, options = T.unsafe(nil)); end
-  def increment(name, amount = T.unsafe(nil), options = T.unsafe(nil)); end
+  def fetch_multi(*names, &block); end
+  def increment(name, amount = T.unsafe(nil), **options); end
   def middleware; end
   def with_local_cache(&block); end
 
@@ -948,6 +952,8 @@ class ActiveSupport::CurrentAttributes
     def _reset_callbacks=(value); end
     def after_reset(*methods, &block); end
     def attribute(*names, default: T.unsafe(nil)); end
+    def attributes(&_arg0); end
+    def attributes=(arg); end
     def before_reset(*methods, &block); end
     def clear_all; end
     def defaults; end
@@ -1892,6 +1898,7 @@ class ActiveSupport::MessageVerifier < ::ActiveSupport::Messages::Codec
 
   private
 
+  def decode(encoded, url_safe: T.unsafe(nil)); end
   def digest_length_in_hex; end
   def digest_matches_data?(digest, data); end
   def extract_encoded(signed); end
@@ -1986,6 +1993,7 @@ module ActiveSupport::Messages::Rotator
   def initialize(*args, on_rotation: T.unsafe(nil), **options); end
 
   def fall_back_to(fallback); end
+  def on_rotation(&on_rotation); end
   def read_message(message, on_rotation: T.unsafe(nil), **options); end
   def rotate(*args, **options); end
 
@@ -2846,7 +2854,7 @@ class ActiveSupport::TestCase < ::Minitest::Test
   def assert_not_empty(obj, msg = T.unsafe(nil)); end
   def assert_not_equal(exp, act, msg = T.unsafe(nil)); end
   def assert_not_in_delta(exp, act, delta = T.unsafe(nil), msg = T.unsafe(nil)); end
-  def assert_not_in_epsilon(a, b, epsilon = T.unsafe(nil), msg = T.unsafe(nil)); end
+  def assert_not_in_epsilon(exp, act, epsilon = T.unsafe(nil), msg = T.unsafe(nil)); end
   def assert_not_includes(collection, obj, msg = T.unsafe(nil)); end
   def assert_not_instance_of(cls, obj, msg = T.unsafe(nil)); end
   def assert_not_kind_of(cls, obj, msg = T.unsafe(nil)); end
@@ -3044,9 +3052,10 @@ class ActiveSupport::Testing::Parallelization::Server
   def interrupt; end
   def pop; end
   def record(reporter, result); end
+  def remove_dead_workers(dead_pids); end
   def shutdown; end
-  def start_worker(worker_id); end
-  def stop_worker(worker_id); end
+  def start_worker(worker_id, worker_pid); end
+  def stop_worker(worker_id, worker_pid); end
 end
 
 class ActiveSupport::Testing::Parallelization::Worker
@@ -3334,7 +3343,7 @@ end
 module ActiveSupport::VERSION; end
 ActiveSupport::VERSION::MAJOR = T.let(T.unsafe(nil), Integer)
 ActiveSupport::VERSION::MINOR = T.let(T.unsafe(nil), Integer)
-ActiveSupport::VERSION::PRE = T.let(T.unsafe(nil), String)
+ActiveSupport::VERSION::PRE = T.let(T.unsafe(nil), T.untyped)
 ActiveSupport::VERSION::STRING = T.let(T.unsafe(nil), String)
 ActiveSupport::VERSION::TINY = T.let(T.unsafe(nil), Integer)
 
@@ -3396,6 +3405,7 @@ class Array
   include ::Enumerable
 
   def as_json(options = T.unsafe(nil)); end
+  def blank?; end
   def compact_blank!; end
   def extract_options!; end
   def present?; end
@@ -3411,7 +3421,6 @@ class BigDecimal < ::Numeric
   include ::ActiveSupport::BigDecimalWithDefaultFormat
 
   def as_json(options = T.unsafe(nil)); end
-  def to_s(format = T.unsafe(nil)); end
 end
 
 class Class < ::Module
@@ -3442,6 +3451,8 @@ class Date
   def beginning_of_day; end
   def change(options); end
   def compare_with_coercion(other); end
+  def compare_without_coercion(_arg0); end
+  def default_inspect; end
   def end_of_day; end
   def in(seconds); end
   def inspect; end
@@ -3449,8 +3460,10 @@ class Date
   def middle_of_day; end
   def midnight; end
   def minus_with_duration(other); end
+  def minus_without_duration(_arg0); end
   def noon; end
   def plus_with_duration(other); end
+  def plus_without_duration(_arg0); end
   def readable_inspect; end
   def since(seconds); end
   def to_formatted_s(format = T.unsafe(nil)); end
@@ -3584,6 +3597,7 @@ class DateTime < ::Date
   def beginning_of_hour; end
   def beginning_of_minute; end
   def change(options); end
+  def default_inspect; end
   def end_of_day; end
   def end_of_hour; end
   def end_of_minute; end
@@ -3629,6 +3643,8 @@ class Delegator < ::BasicObject
   include ::ActiveSupport::Tryable
 end
 
+module ERB::Escape; end
+
 module ERB::Util
   include ::ActiveSupport::CoreExt::ERBUtil
   include ::ActiveSupport::CoreExt::ERBUtilPrivate
@@ -3641,8 +3657,6 @@ module ERB::Util
   def xml_name_escape(name); end
 
   class << self
-    def h(s); end
-    def html_escape(s); end
     def html_escape_once(s); end
     def json_escape(s); end
     def tokenize(source); end
@@ -3711,6 +3725,7 @@ class Hash
 
   def as_json(options = T.unsafe(nil)); end
   def assert_valid_keys(*valid_keys); end
+  def blank?; end
   def compact_blank; end
   def compact_blank!; end
   def deep_merge?(other); end
@@ -3826,16 +3841,7 @@ IO::Buffer::PAGE_SIZE = T.let(T.unsafe(nil), Integer)
 IO::Buffer::PRIVATE = T.let(T.unsafe(nil), Integer)
 IO::Buffer::READONLY = T.let(T.unsafe(nil), Integer)
 IO::Buffer::SHARED = T.let(T.unsafe(nil), Integer)
-
-class IO::ConsoleMode
-  def echo=(_arg0); end
-  def raw(*_arg0); end
-  def raw!(*_arg0); end
-
-  private
-
-  def initialize_copy(_arg0); end
-end
+class IO::ConsoleMode; end
 
 class IO::EAGAINWaitReadable < ::Errno::EAGAIN
   include ::IO::WaitReadable
@@ -3857,13 +3863,7 @@ IO::EWOULDBLOCKWaitReadable = IO::EAGAINWaitReadable
 IO::EWOULDBLOCKWaitWritable = IO::EAGAINWaitWritable
 IO::PRIORITY = T.let(T.unsafe(nil), Integer)
 IO::READABLE = T.let(T.unsafe(nil), Integer)
-class IO::TimeoutError < ::IOError; end
 IO::WRITABLE = T.let(T.unsafe(nil), Integer)
-
-class IPAddr
-  def as_json(options = T.unsafe(nil)); end
-end
-
 class Integer < ::Numeric; end
 
 module Kernel
@@ -3913,8 +3913,8 @@ class NilClass
   def blank?; end
   def present?; end
   def to_param; end
-  def try(*_arg0); end
-  def try!(*_arg0); end
+  def try(*_arg0, &_arg1); end
+  def try!(*_arg0, &_arg1); end
 end
 
 class Numeric
@@ -4058,6 +4058,7 @@ class Symbol
   include ::Comparable
 
   def as_json(options = T.unsafe(nil)); end
+  def blank?; end
   def present?; end
 end
 
@@ -4094,11 +4095,13 @@ class Time
   def blank?; end
   def change(options); end
   def compare_with_coercion(other); end
+  def compare_without_coercion(_arg0); end
   def end_of_day; end
   def end_of_hour; end
   def end_of_minute; end
   def eql?(other); end
   def eql_with_coercion(other); end
+  def eql_without_coercion(_arg0); end
   def formatted_offset(colon = T.unsafe(nil), alternate_utc_string = T.unsafe(nil)); end
   def in(seconds); end
   def midday; end
@@ -4107,15 +4110,18 @@ class Time
   def minus_with_coercion(other); end
   def minus_with_duration(other); end
   def minus_without_coercion(other); end
+  def minus_without_duration(_arg0); end
   def next_day(days = T.unsafe(nil)); end
   def next_month(months = T.unsafe(nil)); end
   def next_year(years = T.unsafe(nil)); end
   def noon; end
   def plus_with_duration(other); end
+  def plus_without_duration(_arg0); end
   def present?; end
   def prev_day(days = T.unsafe(nil)); end
   def prev_month(months = T.unsafe(nil)); end
   def prev_year(years = T.unsafe(nil)); end
+  def rfc3339(*_arg0); end
   def sec_fraction; end
   def seconds_since_midnight; end
   def seconds_until_end_of_day; end
@@ -4127,6 +4133,7 @@ class Time
     def ===(other); end
     def at(time_or_number, *args, **_arg2); end
     def at_with_coercion(time_or_number, *args, **_arg2); end
+    def at_without_coercion(time, subsec = T.unsafe(nil), unit = T.unsafe(nil), in: T.unsafe(nil)); end
     def current; end
     def days_in_month(month, year = T.unsafe(nil)); end
     def days_in_year(year = T.unsafe(nil)); end
@@ -4152,7 +4159,5 @@ class TrueClass
 end
 
 class URI::Generic
-  include ::URI::RFC2396_REGEXP
-
   def as_json(options = T.unsafe(nil)); end
 end

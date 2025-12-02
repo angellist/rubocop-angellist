@@ -112,6 +112,7 @@ module Thor::Actions
   def find_in_source_paths(file); end
   def get(source, *args, &block); end
   def gsub_file(path, flag, *args, &block); end
+  def gsub_file!(path, flag, *args, &block); end
   def in_root; end
   def inject_into_class(path, klass, *args, &block); end
   def inject_into_file(destination, *args, &block); end
@@ -138,6 +139,7 @@ module Thor::Actions
 
   private
 
+  def actually_gsub_file(path, flag, args, error_on_no_change, &block); end
   def capture(*args); end
   def concat(string); end
   def output_buffer; end
@@ -747,7 +749,6 @@ class Thor::Shell::Basic
   def ask_simply(statement, color, options); end
   def can_display_colors?; end
   def file_collision_help(block_given); end
-  def git_merge_tool; end
   def is?(value); end
   def lookup_color(color); end
   def merge(destination, content); end

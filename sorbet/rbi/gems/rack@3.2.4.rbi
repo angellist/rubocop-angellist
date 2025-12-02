@@ -261,8 +261,10 @@ end
 class Rack::Events::EventedBodyProxy < ::Rack::BodyProxy
   def initialize(body, request, response, handlers, &block); end
 
+  def call(stream); end
   def each; end
   def request; end
+  def respond_to?(method_name, include_all = T.unsafe(nil)); end
   def response; end
 end
 
@@ -374,11 +376,15 @@ class Rack::Lint
   def call(env = T.unsafe(nil)); end
 end
 
+Rack::Lint::ALLOWED_SCHEMES = T.let(T.unsafe(nil), Array)
+Rack::Lint::HOST_PATTERN = T.let(T.unsafe(nil), Regexp)
+Rack::Lint::HTTP_HOST_PATTERN = T.let(T.unsafe(nil), Regexp)
 class Rack::Lint::LintError < ::RuntimeError; end
 Rack::Lint::REQUEST_PATH_ABSOLUTE_FORM = T.let(T.unsafe(nil), Regexp)
 Rack::Lint::REQUEST_PATH_ASTERISK_FORM = T.let(T.unsafe(nil), String)
 Rack::Lint::REQUEST_PATH_AUTHORITY_FORM = T.let(T.unsafe(nil), Regexp)
 Rack::Lint::REQUEST_PATH_ORIGIN_FORM = T.let(T.unsafe(nil), Regexp)
+Rack::Lint::SERVER_NAME_PATTERN = T.let(T.unsafe(nil), Regexp)
 
 class Rack::Lint::Wrapper
   def initialize(app, env); end
@@ -404,6 +410,10 @@ class Rack::Lint::Wrapper
   def to_path; end
   def verify_content_length(size); end
   def verify_to_path; end
+
+  private
+
+  def assert_required(key); end
 end
 
 Rack::Lint::Wrapper::BODY_METHODS = T.let(T.unsafe(nil), Hash)
@@ -451,12 +461,6 @@ class Rack::Lock
   private
 
   def unlock; end
-end
-
-class Rack::Logger
-  def initialize(app, level = T.unsafe(nil)); end
-
-  def call(env); end
 end
 
 class Rack::MediaType
@@ -553,6 +557,22 @@ class Rack::MockResponse < ::Rack::Response
   end
 end
 
+class Rack::MockResponse::Cookie
+  def initialize(args); end
+
+  def domain; end
+  def expires; end
+  def method_missing(method_name, *args, **_arg2, &block); end
+  def name; end
+  def path; end
+  def secure; end
+  def value; end
+
+  private
+
+  def respond_to_missing?(method_name, include_all = T.unsafe(nil)); end
+end
+
 module Rack::Multipart
   class << self
     def build_multipart(params, first = T.unsafe(nil)); end
@@ -572,6 +592,7 @@ class Rack::Multipart::EmptyContentError < ::EOFError
 end
 
 Rack::Multipart::Error = Rack::Multipart::BoundaryTooLongError
+Rack::Multipart::FWS = T.let(T.unsafe(nil), Regexp)
 
 class Rack::Multipart::Generator
   def initialize(params, first = T.unsafe(nil)); end
@@ -586,6 +607,7 @@ class Rack::Multipart::Generator
   def multipart?; end
 end
 
+Rack::Multipart::HEADER_VALUE = T.let(T.unsafe(nil), String)
 Rack::Multipart::MULTIPART = T.let(T.unsafe(nil), Regexp)
 Rack::Multipart::MULTIPART_BOUNDARY = T.let(T.unsafe(nil), String)
 Rack::Multipart::MULTIPART_CONTENT_DISPOSITION = T.let(T.unsafe(nil), Regexp)
@@ -626,9 +648,9 @@ class Rack::Multipart::Parser
   private
 
   def consume_boundary; end
-  def dequote(str); end
   def find_encoding(enc); end
   def handle_consume_token; end
+  def handle_dummy_encoding(name, body); end
   def handle_empty_content!(content); end
   def handle_fast_forward; end
   def handle_mime_body; end
@@ -636,6 +658,7 @@ class Rack::Multipart::Parser
   def normalize_filename(filename); end
   def read_data(io, outbuf); end
   def tag_multipart_encoding(filename, content_type, name, body); end
+  def update_retained_size(size); end
 
   class << self
     def parse(io, content_length, content_type, tmpfile, bufsize, qp); end
@@ -643,6 +666,8 @@ class Rack::Multipart::Parser
   end
 end
 
+Rack::Multipart::Parser::BOUNDARY_START_LIMIT = T.let(T.unsafe(nil), Integer)
+Rack::Multipart::Parser::BUFFERED_UPLOAD_BYTESIZE_LIMIT = T.let(T.unsafe(nil), Integer)
 Rack::Multipart::Parser::BUFSIZE = T.let(T.unsafe(nil), Integer)
 
 class Rack::Multipart::Parser::BoundedIO
@@ -685,6 +710,7 @@ class Rack::Multipart::Parser::Collector::TempfilePart < ::Rack::Multipart::Pars
 end
 
 Rack::Multipart::Parser::EMPTY = T.let(T.unsafe(nil), Rack::Multipart::Parser::MultipartInfo)
+Rack::Multipart::Parser::MIME_HEADER_BYTESIZE_LIMIT = T.let(T.unsafe(nil), Integer)
 
 class Rack::Multipart::Parser::MultipartInfo < ::Struct
   def params; end
@@ -701,6 +727,7 @@ class Rack::Multipart::Parser::MultipartInfo < ::Struct
   end
 end
 
+Rack::Multipart::Parser::REENCODE_DUMMY_ENCODINGS = T.let(T.unsafe(nil), Hash)
 Rack::Multipart::Parser::TEMPFILE_FACTORY = T.let(T.unsafe(nil), Proc)
 Rack::Multipart::Parser::TEXT_PLAIN = T.let(T.unsafe(nil), String)
 
@@ -713,7 +740,10 @@ class Rack::Multipart::UploadedFile
   def method_missing(method_name, *args, &block); end
   def original_filename; end
   def path; end
-  def respond_to?(*args); end
+
+  private
+
+  def respond_to_missing?(*args); end
 end
 
 class Rack::NullLogger
@@ -761,33 +791,39 @@ Rack::PUT = T.let(T.unsafe(nil), String)
 Rack::QUERY_STRING = T.let(T.unsafe(nil), String)
 
 class Rack::QueryParser
-  def initialize(params_class, param_depth_limit); end
+  def initialize(params_class, param_depth_limit, bytesize_limit: T.unsafe(nil), params_limit: T.unsafe(nil)); end
 
+  def bytesize_limit; end
   def make_params; end
   def new_depth_limit(param_depth_limit); end
   def normalize_params(params, name, v, _depth = T.unsafe(nil)); end
   def param_depth_limit; end
   def parse_nested_query(qs, separator = T.unsafe(nil)); end
   def parse_query(qs, separator = T.unsafe(nil), &unescaper); end
+  def parse_query_pairs(qs, separator = T.unsafe(nil)); end
 
   private
 
   def _normalize_params(params, name, v, depth); end
+  def each_query_pair(qs, separator, unescaper = T.unsafe(nil)); end
   def params_hash_has_key?(hash, key); end
   def params_hash_type?(obj); end
   def unescape(string, encoding = T.unsafe(nil)); end
 
   class << self
-    def make_default(param_depth_limit); end
+    def make_default(param_depth_limit, **options); end
   end
 end
 
+Rack::QueryParser::BYTESIZE_LIMIT = T.let(T.unsafe(nil), Integer)
 Rack::QueryParser::COMMON_SEP = T.let(T.unsafe(nil), Hash)
 Rack::QueryParser::DEFAULT_SEP = T.let(T.unsafe(nil), Regexp)
 
 class Rack::QueryParser::InvalidParameterError < ::ArgumentError
   include ::Rack::BadRequest
 end
+
+Rack::QueryParser::PARAMS_LIMIT = T.let(T.unsafe(nil), Integer)
 
 class Rack::QueryParser::ParameterTypeError < ::TypeError
   include ::Rack::BadRequest
@@ -797,7 +833,9 @@ class Rack::QueryParser::Params < ::Hash
   def to_params_hash; end
 end
 
-class Rack::QueryParser::ParamsTooDeepError < ::RangeError
+Rack::QueryParser::ParamsTooDeepError = Rack::QueryParser::QueryLimitError
+
+class Rack::QueryParser::QueryLimitError < ::RangeError
   include ::Rack::BadRequest
 end
 
@@ -810,6 +848,7 @@ Rack::RACK_LOGGER = T.let(T.unsafe(nil), String)
 Rack::RACK_METHODOVERRIDE_ORIGINAL_METHOD = T.let(T.unsafe(nil), String)
 Rack::RACK_MULTIPART_BUFFER_SIZE = T.let(T.unsafe(nil), String)
 Rack::RACK_MULTIPART_TEMPFILE_FACTORY = T.let(T.unsafe(nil), String)
+Rack::RACK_PROTOCOL = T.let(T.unsafe(nil), String)
 Rack::RACK_RECURSIVE_INCLUDE = T.let(T.unsafe(nil), String)
 Rack::RACK_REQUEST_COOKIE_HASH = T.let(T.unsafe(nil), String)
 Rack::RACK_REQUEST_COOKIE_STRING = T.let(T.unsafe(nil), String)
@@ -860,6 +899,7 @@ class Rack::Request
   def initialize(env); end
 
   def delete_param(k); end
+  def ip; end
   def params; end
   def update_param(k, v); end
 
@@ -907,6 +947,7 @@ module Rack::Request::Helpers
   def delete?; end
   def delete_param(k); end
   def form_data?; end
+  def form_pairs; end
   def forwarded_authority; end
   def forwarded_for; end
   def forwarded_port; end
@@ -932,6 +973,7 @@ module Rack::Request::Helpers
   def port; end
   def post?; end
   def put?; end
+  def query_parser=(_arg0); end
   def query_string; end
   def referer; end
   def referrer; end
@@ -951,7 +993,6 @@ module Rack::Request::Helpers
   def update_param(k, v); end
   def url; end
   def user_agent; end
-  def values_at(*keys); end
   def xhr?; end
 
   private
@@ -966,7 +1007,6 @@ module Rack::Request::Helpers
   def parse_multipart; end
   def parse_query(qs, d = T.unsafe(nil)); end
   def query_parser; end
-  def reject_trusted_ip_addresses(ip_addresses); end
   def split_authority(authority); end
   def split_header(value); end
   def wrap_ipv6(host); end
@@ -1130,6 +1170,7 @@ class Rack::Sendfile
 
   def map_accel_path(env, path); end
   def variation(env); end
+  def x_accel_mapping(env); end
 end
 
 class Rack::ShowExceptions
@@ -1233,7 +1274,6 @@ module Rack::Utils
   def delete_set_cookie_header(key, value = T.unsafe(nil)); end
   def delete_set_cookie_header!(header, key, value = T.unsafe(nil)); end
   def escape(s); end
-  def escape_cookie_key(key); end
   def escape_html(_arg0); end
   def escape_path(s); end
   def forwarded_values(forwarded_header); end
@@ -1266,7 +1306,6 @@ module Rack::Utils
     def delete_set_cookie_header(key, value = T.unsafe(nil)); end
     def delete_set_cookie_header!(header, key, value = T.unsafe(nil)); end
     def escape(s); end
-    def escape_cookie_key(key); end
     def escape_html(_arg0); end
     def escape_path(s); end
     def forwarded_values(forwarded_header); end
@@ -1317,8 +1356,9 @@ Rack::Utils::OBSOLETE_SYMBOLS_TO_STATUS_CODES = T.let(T.unsafe(nil), Hash)
 Rack::Utils::OBSOLETE_SYMBOL_MAPPINGS = T.let(T.unsafe(nil), Hash)
 Rack::Utils::PATH_SEPS = T.let(T.unsafe(nil), Regexp)
 Rack::Utils::ParameterTypeError = Rack::QueryParser::ParameterTypeError
-Rack::Utils::ParamsTooDeepError = Rack::QueryParser::ParamsTooDeepError
+Rack::Utils::ParamsTooDeepError = Rack::QueryParser::QueryLimitError
 Rack::Utils::STATUS_WITH_NO_ENTITY_BODY = T.let(T.unsafe(nil), Hash)
 Rack::Utils::SYMBOL_TO_STATUS_CODE = T.let(T.unsafe(nil), Hash)
 Rack::Utils::URI_PARSER = T.let(T.unsafe(nil), URI::RFC2396_Parser)
 Rack::Utils::VALID_COOKIE_KEY = T.let(T.unsafe(nil), Regexp)
+Rack::VERSION = T.let(T.unsafe(nil), String)

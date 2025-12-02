@@ -5,6 +5,28 @@
 # Please instead update this file by running `bin/tapioca gem json`.
 
 
+class Array
+  include ::Enumerable
+  include ::JSON::Ext::Generator::GeneratorMethods::Array
+end
+
+class FalseClass
+  include ::JSON::Ext::Generator::GeneratorMethods::FalseClass
+end
+
+class Float < ::Numeric
+  include ::JSON::Ext::Generator::GeneratorMethods::Float
+end
+
+class Hash
+  include ::Enumerable
+  include ::JSON::Ext::Generator::GeneratorMethods::Hash
+end
+
+class Integer < ::Numeric
+  include ::JSON::Ext::Generator::GeneratorMethods::Integer
+end
+
 module JSON
   private
 
@@ -25,16 +47,23 @@ module JSON
 
   class << self
     def [](object, opts = T.unsafe(nil)); end
+    def _dump_default_options; end
+    def _load_default_options; end
+    def _unsafe_load_default_options; end
     def create_id; end
     def create_id=(new_value); end
-    def deep_const_get(path); end
+    def deprecation_warning(message, uplevel = T.unsafe(nil)); end
     def dump(obj, anIO = T.unsafe(nil), limit = T.unsafe(nil), kwargs = T.unsafe(nil)); end
+    def dump_default_options; end
+    def dump_default_options=(val); end
     def fast_generate(obj, opts = T.unsafe(nil)); end
     def fast_unparse(*_arg0, **_arg1, &_arg2); end
     def generate(obj, opts = T.unsafe(nil)); end
     def generator; end
     def generator=(generator); end
     def load(source, proc = T.unsafe(nil), options = T.unsafe(nil)); end
+    def load_default_options; end
+    def load_default_options=(val); end
     def load_file(filespec, opts = T.unsafe(nil)); end
     def load_file!(filespec, opts = T.unsafe(nil)); end
     def parse(source, opts = T.unsafe(nil)); end
@@ -48,11 +77,14 @@ module JSON
     def state=(_arg0); end
     def unparse(*_arg0, **_arg1, &_arg2); end
     def unsafe_load(source, proc = T.unsafe(nil), options = T.unsafe(nil)); end
+    def unsafe_load_default_options; end
+    def unsafe_load_default_options=(val); end
 
     private
 
     def const_missing(const_name); end
     def deprecated_singleton_attr_accessor(*attrs); end
+    def on_mixed_keys_hash(hash, do_raise); end
   end
 end
 
@@ -66,15 +98,96 @@ class JSON::Coder
   def parse(source); end
 end
 
+module JSON::Ext::Generator::GeneratorMethods::Array
+  def to_json(*_arg0); end
+end
+
+module JSON::Ext::Generator::GeneratorMethods::FalseClass
+  def to_json(*_arg0); end
+end
+
+module JSON::Ext::Generator::GeneratorMethods::Float
+  def to_json(*_arg0); end
+end
+
+module JSON::Ext::Generator::GeneratorMethods::Hash
+  def to_json(*_arg0); end
+end
+
+module JSON::Ext::Generator::GeneratorMethods::Integer
+  def to_json(*_arg0); end
+end
+
+module JSON::Ext::Generator::GeneratorMethods::NilClass
+  def to_json(*_arg0); end
+end
+
+module JSON::Ext::Generator::GeneratorMethods::Object
+  def to_json(*_arg0); end
+end
+
+module JSON::Ext::Generator::GeneratorMethods::String
+  def to_json(*_arg0); end
+end
+
+module JSON::Ext::Generator::GeneratorMethods::TrueClass
+  def to_json(*_arg0); end
+end
+
 class JSON::Ext::Generator::State
   def initialize(opts = T.unsafe(nil)); end
 
   def [](name); end
   def []=(name, value); end
+  def allow_nan=(_arg0); end
+  def allow_nan?; end
+  def array_nl; end
+  def array_nl=(_arg0); end
+  def as_json; end
+  def as_json=(_arg0); end
+  def ascii_only=(_arg0); end
+  def ascii_only?; end
+  def buffer_initial_length; end
+  def buffer_initial_length=(_arg0); end
+  def check_circular?; end
   def configure(opts); end
+  def depth; end
+  def depth=(_arg0); end
+  def escape_slash; end
+  def escape_slash=(_arg0); end
+  def escape_slash?; end
+  def generate(*_arg0); end
+  def generate_new(*_arg0); end
+  def indent; end
+  def indent=(_arg0); end
+  def max_nesting; end
+  def max_nesting=(_arg0); end
   def merge(opts); end
+  def object_nl; end
+  def object_nl=(_arg0); end
+  def script_safe; end
+  def script_safe=(_arg0); end
+  def script_safe?; end
+  def space; end
+  def space=(_arg0); end
+  def space_before; end
+  def space_before=(_arg0); end
+  def strict; end
+  def strict=(_arg0); end
+  def strict?; end
   def to_h; end
   def to_hash; end
+
+  private
+
+  def _configure(_arg0); end
+  def allow_duplicate_key?; end
+  def initialize_copy(_arg0); end
+
+  class << self
+    def from_state(_arg0); end
+    def generate(_arg0, _arg1, _arg2); end
+  end
 end
 
 class JSON::Ext::Parser
@@ -82,9 +195,19 @@ class JSON::Ext::Parser
 
   def parse; end
   def source; end
+
+  class << self
+    def parse(_arg0, _arg1); end
+  end
 end
 
 JSON::Ext::Parser::Config = JSON::Ext::ParserConfig
+
+class JSON::Ext::ParserConfig
+  def initialize(_arg0); end
+
+  def parse(_arg0); end
+end
 
 class JSON::Fragment < ::Struct
   def initialize(json); end
@@ -116,6 +239,7 @@ class JSON::GenericObject < ::OpenStruct
   def |(other); end
 
   class << self
+    def [](*_arg0); end
     def dump(obj, *args); end
     def from_hash(object); end
     def json_creatable=(_arg0); end
@@ -128,6 +252,11 @@ end
 JSON::PARSE_L_OPTIONS = T.let(T.unsafe(nil), Hash)
 JSON::PRETTY_GENERATE_OPTIONS = T.let(T.unsafe(nil), Hash)
 JSON::Parser = JSON::Ext::Parser
+
+class JSON::ParserError < ::JSON::JSONError
+  def column; end
+  def line; end
+end
 
 module JSON::ParserOptions
   class << self
@@ -150,4 +279,23 @@ module Kernel
   def JSON(object, opts = T.unsafe(nil)); end
   def j(*objs); end
   def jj(*objs); end
+end
+
+class NilClass
+  include ::JSON::Ext::Generator::GeneratorMethods::NilClass
+end
+
+class Object < ::BasicObject
+  include ::Kernel
+  include ::PP::ObjectMixin
+  include ::JSON::Ext::Generator::GeneratorMethods::Object
+end
+
+class String
+  include ::Comparable
+  include ::JSON::Ext::Generator::GeneratorMethods::String
+end
+
+class TrueClass
+  include ::JSON::Ext::Generator::GeneratorMethods::TrueClass
 end
