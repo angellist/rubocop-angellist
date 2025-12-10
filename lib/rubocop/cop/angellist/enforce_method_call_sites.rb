@@ -1,6 +1,7 @@
 # frozen_string_literal: true
-# typed: false
+# typed: strict
 
+require 'sorbet-runtime'
 require 'rubocop'
 
 module RuboCop
@@ -21,32 +22,45 @@ module RuboCop
       #         AllowedCallSites:
       #           - app/controllers/admin/**/*.rb
       class EnforceMethodCallSites < Base
+        extend T::Sig
+
+        sig { params(config: RuboCop::Config, options: T::Hash[Symbol, T.untyped]).void }
+        def initialize(config = RuboCop::Config.new, options = {})
+          super
+          @const_assignments = T.let({}, T::Hash[Symbol, String])
+          @restrictions = T.let(nil, T.nilable(T::Array[T::Hash[String, T.untyped]]))
+        end
+
+        sig { params(node: RuboCop::AST::SendNode).void }
         def on_send(node)
           check_method_call(node)
           check_dynamic_send(node)
         end
 
+        sig { params(node: RuboCop::AST::SendNode).void }
         def on_csend(node)
           # Handle safe navigation operator (&.)
           check_method_call(node)
           check_dynamic_send(node)
         end
 
+        sig { params(node: RuboCop::AST::Node).void }
         def on_lvasgn(node)
           # Track local variable assignments to constants
           return if !node.children[1]&.const_type?
 
-          @const_assignments ||= {}
+# No need to reassign, already initialized in constructor
           var_name = node.children[0]
           const_name = extract_const_name(node.children[1])
           @const_assignments[var_name] = const_name if const_name
         end
 
+        sig { params(node: RuboCop::AST::Node).void }
         def on_ivasgn(node)
           # Track instance variable assignments to constants
           return if !node.children[1]&.const_type?
 
-          @const_assignments ||= {}
+# No need to reassign, already initialized in constructor
           var_name = node.children[0]
           const_name = extract_const_name(node.children[1])
           @const_assignments[var_name] = const_name if const_name
@@ -54,6 +68,7 @@ module RuboCop
 
         private
 
+        sig { params(node: RuboCop::AST::SendNode).void }
         def check_method_call(node)
           # Special handling for .method(:method_name) calls
           if node.method_name == :method && node.arguments.first&.sym_type?
@@ -69,6 +84,7 @@ module RuboCop
           end
         end
 
+        sig { params(node: RuboCop::AST::SendNode).void }
         def check_method_reference(node)
           # Check for Module.method(:method_name) pattern
           method_name = node.arguments.first.value.to_sym
@@ -77,7 +93,7 @@ module RuboCop
 
           restrictions.each do |restriction|
             methods = parse_methods(restriction['Methods'])
-            next if methods != :all && !methods.include?(method_name)
+            next if methods.any? && !methods.include?(method_name)
 
             expected_module = normalize_module_name(restriction['Module'])
             next if normalize_module_name(receiver_module) != expected_module
@@ -87,6 +103,7 @@ module RuboCop
           end
         end
 
+        sig { params(node: RuboCop::AST::SendNode).void }
         def check_dynamic_send(node)
           # Check for send(:method_name, ...) or public_send(:method_name, ...)
           return if ![:send, :public_send, :__send__].include?(node.method_name)
@@ -98,7 +115,7 @@ module RuboCop
 
           restrictions.each do |restriction|
             methods = parse_methods(restriction['Methods'])
-            next if methods != :all && !methods.include?(method_name)
+            next if methods.any? && !methods.include?(method_name)
 
             expected_module = normalize_module_name(restriction['Module'])
             next if normalize_module_name(receiver_module) != expected_module
@@ -108,17 +125,19 @@ module RuboCop
           end
         end
 
+        sig { returns(T::Array[T::Hash[String, T.untyped]]) }
         def restrictions
           @restrictions ||= cop_config['Restrictions'] || []
         end
 
+        sig { params(node: RuboCop::AST::SendNode, restriction: T::Hash[String, T.untyped]).returns(T::Boolean) }
         def matches_restriction?(node, restriction)
           # Skip dynamic send methods themselves - we handle those separately
           return false if [:send, :public_send, :__send__].include?(node.method_name)
 
           # Check if method matches (defaults to all if not specified)
           methods = parse_methods(restriction['Methods'])
-          return false if methods != :all && !methods.include?(node.method_name)
+          return false if methods.any? && !methods.include?(node.method_name)
 
           # Check if receiver matches the module/class
           expected_module = restriction['Module']
@@ -131,6 +150,7 @@ module RuboCop
           normalize_module_name(actual_module) == normalize_module_name(expected_module)
         end
 
+        sig { params(receiver: T.nilable(RuboCop::AST::Node)).returns(T.nilable(String)) }
         def resolve_receiver_module(receiver)
           return if !receiver
 
@@ -140,7 +160,7 @@ module RuboCop
             extract_const_name(receiver)
           when :lvar, :ivar
             # Variable that might hold a constant
-            @const_assignments ||= {}
+  # No need to reassign, already initialized in constructor
             var_name = receiver.children[0]
             @const_assignments[var_name]
           when :send, :csend
@@ -152,29 +172,33 @@ module RuboCop
           end
         end
 
+        sig { params(node: T.nilable(RuboCop::AST::Node)).returns(T.nilable(String)) }
         def extract_const_name(node)
           return if !node&.const_type?
 
           parts = []
           current = node
-          while current&.const_type?
+          while current && current.const_type?
             parts.unshift(current.children[1].to_s)
-            current = current.children[0]
+            current = T.let(current.children[0], T.nilable(RuboCop::AST::Node))
           end
           parts.join('::')
         end
 
+        sig { params(module_name: T.nilable(T.any(String, Symbol))).returns(String) }
         def normalize_module_name(module_name)
           # Remove leading :: to normalize fully-qualified names
           module_name.to_s.gsub(/^::/, '')
         end
 
+        sig { params(methods: T.untyped).returns(T::Array[Symbol]) }
         def parse_methods(methods)
-          return :all if [nil, 'all', :all].include?(methods)
+          return [] if [nil, 'all', :all].include?(methods)
 
           Array(methods).map(&:to_sym)
         end
 
+        sig { params(restriction: T::Hash[String, T.untyped]).returns(T::Boolean) }
         def allowed_call_site?(restriction)
           file_path = processed_source.file_path
           allowed_call_sites = restriction['AllowedCallSites'] || []
@@ -190,6 +214,7 @@ module RuboCop
           end
         end
 
+        sig { params(node: RuboCop::AST::SendNode, restriction: T::Hash[String, T.untyped]).returns(String) }
         def build_message(node, restriction)
           allowed_sites = restriction['AllowedCallSites'] || []
           "#{node.receiver.source}.#{node.method_name} can only be called from: #{allowed_sites.join(', ')}"
