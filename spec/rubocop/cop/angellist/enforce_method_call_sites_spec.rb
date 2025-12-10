@@ -255,6 +255,116 @@ RSpec.describe RuboCop::Cop::Angellist::EnforceMethodCallSites, :config do
     end
   end
 
+  context 'with different modules having same method names' do
+    let(:restrictions) do
+      [
+        {
+          'Module' => 'Payment::Service',
+          'Methods' => ['process', 'validate'],
+          'AllowedCallSites' => ['app/models/payment.rb'],
+        },
+        {
+          'Module' => 'Order::Service',
+          'Methods' => ['process', 'validate'],
+          'AllowedCallSites' => ['app/models/order.rb'],
+        },
+      ]
+    end
+
+    it 'does not confuse different modules with same method names' do
+      expect_offense(<<~RUBY, 'app/controllers/test_controller.rb')
+        class TestController
+          def run
+            # Payment::Service.process should be flagged
+            Payment::Service.process(payment_data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Payment::Service.process can only be called from: app/models/payment.rb
+
+            # Order::Service.process should also be flagged with its own restriction
+            Order::Service.process(order_data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Order::Service.process can only be called from: app/models/order.rb
+
+            # Different module, not restricted
+            Shipping::Service.process(shipping_data) # Should not be flagged
+          end
+        end
+      RUBY
+    end
+
+    it 'allows calls to the correct module from their respective allowed files' do
+      expect_no_offenses(<<~RUBY, 'app/models/payment.rb')
+        class Payment
+          def handle
+            Payment::Service.process(data) # Allowed in payment.rb
+            Payment::Service.validate(data) # Allowed in payment.rb
+            # Note: Order::Service would be flagged here - tested in next spec
+          end
+        end
+      RUBY
+    end
+
+    it 'flags cross-module calls even from allowed files' do
+      expect_offense(<<~RUBY, 'app/models/payment.rb')
+        class Payment
+          def handle
+            Payment::Service.process(data) # OK - Payment::Service allowed in payment.rb
+            Order::Service.process(order)  # Not OK - Order::Service not allowed here
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Order::Service.process can only be called from: app/models/order.rb
+          end
+        end
+      RUBY
+    end
+
+    it 'handles dynamic sends for different modules correctly' do
+      expect_offense(<<~RUBY, 'app/controllers/test_controller.rb')
+        class TestController
+          def run
+            Payment::Service.send(:process, payment_data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Dynamic call to Payment::Service.process can only be made from: app/models/payment.rb
+            Order::Service.send(:process, order_data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Dynamic call to Order::Service.process can only be made from: app/models/order.rb
+            Shipping::Service.send(:process, shipping_data) # Not restricted
+          end
+        end
+      RUBY
+    end
+  end
+
+  context 'with partial module name matches' do
+    let(:restrictions) do
+      [
+        {
+          'Module' => 'Service',
+          'Methods' => ['execute'],
+          'AllowedCallSites' => ['app/services/base_service.rb'],
+        },
+        {
+          'Module' => 'Payment::Service',
+          'Methods' => ['execute'],
+          'AllowedCallSites' => ['app/models/payment.rb'],
+        },
+      ]
+    end
+
+    it 'does not confuse partial module name matches' do
+      expect_offense(<<~RUBY, 'app/controllers/test_controller.rb')
+        class TestController
+          def run
+            # Should match the more specific Payment::Service restriction
+            Payment::Service.execute(data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Payment::Service.execute can only be called from: app/models/payment.rb
+
+            # Should match the generic Service restriction
+            Service.execute(data)
+            ^^^^^^^^^^^^^^^^^^^^^ Service.execute can only be called from: app/services/base_service.rb
+
+            # Should not be flagged - different module
+            Order::Service.execute(data)
+          end
+        end
+      RUBY
+    end
+  end
+
   context 'with edge cases' do
     it 'tracks method references' do
       # Method references are now tracked
