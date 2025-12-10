@@ -1,6 +1,11 @@
 Angellist:
   Enabled: true
 
+Angellist/EnforceMethodCallSites:
+  Enabled: true
+  Description: "Prevent methods from being called in places you don't allow"
+  VersionAdded: "1.1.3"
+
 Angellist/NoUnless:
   Enabled: true
   Description: "Always prefer `if` over `unless`."
