@@ -5,7 +5,7 @@ require 'rubocop'
 
 module RuboCop
   module Cop
-    module Angellist 
+    module Angellist
       # Enforces that certain methods can only be called from specific files or directories
       #
       # @example Configuration in .rubocop.yml
@@ -34,7 +34,7 @@ module RuboCop
 
         def on_lvasgn(node)
           # Track local variable assignments to constants
-          return unless node.children[1]&.const_type?
+          return if !node.children[1]&.const_type?
 
           @const_assignments ||= {}
           var_name = node.children[0]
@@ -44,7 +44,7 @@ module RuboCop
 
         def on_ivasgn(node)
           # Track instance variable assignments to constants
-          return unless node.children[1]&.const_type?
+          return if !node.children[1]&.const_type?
 
           @const_assignments ||= {}
           var_name = node.children[0]
@@ -73,7 +73,7 @@ module RuboCop
           # Check for Module.method(:method_name) pattern
           method_name = node.arguments.first.value.to_sym
           receiver_module = resolve_receiver_module(node.receiver)
-          return unless receiver_module
+          return if !receiver_module
 
           restrictions.each do |restriction|
             methods = parse_methods(restriction['Methods'])
@@ -89,12 +89,12 @@ module RuboCop
 
         def check_dynamic_send(node)
           # Check for send(:method_name, ...) or public_send(:method_name, ...)
-          return unless [:send, :public_send, :__send__].include?(node.method_name)
-          return unless node.arguments.first&.sym_type? || node.arguments.first&.str_type?
+          return if ![:send, :public_send, :__send__].include?(node.method_name)
+          return if !(node.arguments.first&.sym_type? || node.arguments.first&.str_type?)
 
           method_name = node.arguments.first.value.to_sym
           receiver_module = resolve_receiver_module(node.receiver)
-          return unless receiver_module
+          return if !receiver_module
 
           restrictions.each do |restriction|
             methods = parse_methods(restriction['Methods'])
@@ -132,7 +132,7 @@ module RuboCop
         end
 
         def resolve_receiver_module(receiver)
-          return nil if !receiver
+          return if !receiver
 
           case receiver.type
           when :const
@@ -153,7 +153,7 @@ module RuboCop
         end
 
         def extract_const_name(node)
-          return nil if !node&.const_type?
+          return if !node&.const_type?
 
           parts = []
           current = node
