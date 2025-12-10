@@ -2,6 +2,8 @@
 
 require 'rubocop-angellist'
 require 'rubocop/rspec/support'
+require 'pry'
+require 'pry-byebug'
 
 RSpec.configure do |config|
   config.include RuboCop::RSpec::ExpectOffense
