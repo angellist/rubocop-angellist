@@ -49,7 +49,6 @@ module RuboCop
           # Track local variable assignments to constants
           return if !node.children[1]&.const_type?
 
-# No need to reassign, already initialized in constructor
           var_name = node.children[0]
           const_name = extract_const_name(node.children[1])
           @const_assignments[var_name] = const_name if const_name
@@ -60,7 +59,6 @@ module RuboCop
           # Track instance variable assignments to constants
           return if !node.children[1]&.const_type?
 
-# No need to reassign, already initialized in constructor
           var_name = node.children[0]
           const_name = extract_const_name(node.children[1])
           @const_assignments[var_name] = const_name if const_name
@@ -70,8 +68,8 @@ module RuboCop
 
         sig { params(node: RuboCop::AST::SendNode).void }
         def check_method_call(node)
-          # Special handling for .method(:method_name) calls
-          if node.method_name == :method && node.arguments.first&.sym_type?
+          # Special handling for .method(:method_name) or .method("method_name") calls
+          if node.method_name == :method && (node.arguments.first&.sym_type? || node.arguments.first&.str_type?)
             check_method_reference(node)
             return
           end
@@ -160,7 +158,6 @@ module RuboCop
             extract_const_name(receiver)
           when :lvar, :ivar
             # Variable that might hold a constant
-  # No need to reassign, already initialized in constructor
             var_name = receiver.children[0]
             @const_assignments[var_name]
           when :send, :csend
@@ -205,8 +202,8 @@ module RuboCop
 
           allowed_call_sites.any? do |pattern|
             if pattern.include?('**') || pattern.include?('*')
-              # Handle glob patterns
-              File.fnmatch?(pattern, file_path)
+              # Handle glob patterns - use FNM_PATHNAME for proper ** matching
+              File.fnmatch?(pattern, file_path, File::FNM_PATHNAME)
             else
               # Handle exact file names or endings
               file_path.end_with?(pattern)

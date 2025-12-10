@@ -179,6 +179,24 @@ RSpec.describe RuboCop::Cop::Angellist::EnforceMethodCallSites, :config do
         end
       RUBY
     end
+
+    it 'tracks method references for restricted methods only' do
+      expect_offense(<<~RUBY, 'app/controllers/unauthorized_controller.rb')
+        class UnauthorizedController
+          def process
+            # Method references for restricted methods are flagged
+            ref1 = Payment::Service.method(:process_payment)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Method reference to Payment::Service.process_payment can only be made from: app/models/payment.rb
+            ref2 = Payment::Service.method("refund")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Method reference to Payment::Service.refund can only be made from: app/models/payment.rb
+
+            # But unrestricted methods are not flagged
+            ref3 = Payment::Service.method(:validate)  # OK - not restricted
+            ref4 = Payment::Service.method("log_activity")  # OK - not restricted
+          end
+        end
+      RUBY
+    end
   end
 
   context 'with glob patterns in AllowedCallSites' do
@@ -208,6 +226,35 @@ RSpec.describe RuboCop::Cop::Angellist::EnforceMethodCallSites, :config do
         describe Payment do
           it 'processes payment' do
             Payment::Service.process_payment(100)
+          end
+        end
+      RUBY
+    end
+
+    it 'matches deeply nested paths with ** glob pattern' do
+      # Test that ** properly matches multiple directory levels
+      expect_no_offenses(<<~RUBY, 'app/models/deeply/nested/folder/payment_concern.rb')
+        module DeeplyNestedPaymentConcern
+          def process
+            Payment::Service.process_payment(amount)
+          end
+        end
+      RUBY
+
+      expect_no_offenses(<<~RUBY, 'spec/unit/models/concerns/payments/payment_service_spec.rb')
+        describe 'deeply nested spec' do
+          it 'allows calls from deeply nested spec files' do
+            Payment::Service.process_payment(100)
+          end
+        end
+      RUBY
+
+      # But still flags files outside the pattern
+      expect_offense(<<~RUBY, 'lib/tasks/payment_task.rb')
+        class PaymentTask
+          def run
+            Payment::Service.process_payment(100)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Payment::Service.process_payment can only be called from: app/models/**/*.rb, spec/**/*_spec.rb
           end
         end
       RUBY
@@ -367,13 +414,18 @@ RSpec.describe RuboCop::Cop::Angellist::EnforceMethodCallSites, :config do
 
   context 'with edge cases' do
     it 'tracks method references' do
-      # Method references are now tracked
+      # Method references are now tracked with both symbols and strings
       expect_offense(<<~RUBY, 'app/controllers/unauthorized_controller.rb')
         class UnauthorizedController
           def process
             method_ref = Payment::Service.method(:process_payment)
                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Method reference to Payment::Service.process_payment can only be made from: app/models/payment.rb, app/services/payment/service.rb
             method_ref.call(amount)
+
+            # Also tracks string arguments
+            string_ref = Payment::Service.method("process_payment")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Method reference to Payment::Service.process_payment can only be made from: app/models/payment.rb, app/services/payment/service.rb
+            string_ref.call(amount)
           end
         end
       RUBY
