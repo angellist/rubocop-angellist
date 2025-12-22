@@ -19,7 +19,6 @@ AllCops:
   Exclude:
     - app/views/**/* # Dont think this is necessary but… whatever
     - bin/**/*
-    - db/**/*
     - frontend/**/*
     - node_modules/**/*
     - public/**/*
