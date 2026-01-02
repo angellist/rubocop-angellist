@@ -19,6 +19,7 @@ AllCops:
   Exclude:
     - app/views/**/* # Dont think this is necessary but… whatever
     - bin/**/*
+    - db/*_schema.rb
     - frontend/**/*
     - node_modules/**/*
     - public/**/*
