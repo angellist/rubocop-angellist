@@ -22,8 +22,6 @@ module RuboCop
       #         AllowedCallSites:
       #           - app/controllers/admin/**/*.rb
       class EnforceMethodCallSites < Base
-        extend T::Sig
-
         sig { params(config: RuboCop::Config, options: T::Hash[Symbol, T.untyped]).void }
         def initialize(config = RuboCop::Config.new, options = {})
           super
@@ -174,7 +172,7 @@ module RuboCop
           return if !node&.const_type?
 
           parts = []
-          current = node
+          current = T.let(node, T.nilable(RuboCop::AST::Node))
           while current && current.const_type?
             parts.unshift(current.children[1].to_s)
             current = T.let(current.children[0], T.nilable(RuboCop::AST::Node))

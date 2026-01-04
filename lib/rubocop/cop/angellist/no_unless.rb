@@ -20,7 +20,6 @@ module RuboCop
       #   end
       #
       class NoUnless < ::RuboCop::Cop::Base
-        extend T::Sig
         extend AutoCorrector
 
         MSG = 'Use `if !condition` instead of `unless condition`.'

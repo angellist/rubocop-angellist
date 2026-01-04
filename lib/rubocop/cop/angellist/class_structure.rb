@@ -6,12 +6,13 @@ module RuboCop
     module Angellist
       # Extends Layout::ClassStructure to enforce stricter ordering:
       # - Nested classes before class methods
-      # - Class methods before instance methods  
+      # - Class methods before instance methods
       # - GraphQL object_type before constants
       # - Class methods before GraphQL fields
       class ClassStructure < ::RuboCop::Cop::Layout::ClassStructure
         MSG = '`%<current>s` is supposed to appear before `%<previous>s`.'
 
+        sig { params(class_node: RuboCop::AST::ClassNode).void }
         def on_class(class_node)
           super
           check_strict_ordering(class_node)
@@ -19,9 +20,10 @@ module RuboCop
 
         private
 
+        sig { params(class_node: RuboCop::AST::ClassNode).void }
         def check_strict_ordering(class_node)
           return if class_node.sclass_type? # Skip singleton class nodes
-          
+
           elements = class_elements(class_node)
           return if elements.empty?
 
@@ -34,13 +36,14 @@ module RuboCop
           check_graphql_ordering(elements)
         end
 
+        sig { params(elements: T::Array[RuboCop::AST::Node]).void }
         def check_nested_classes_vs_class_methods(elements)
           nested_class_indices = []
           class_method_indices = []
 
           elements.each_with_index do |node, index|
-            next unless node # Skip nil nodes
-            
+            next if !node # Skip nil nodes
+
             if nested_class?(node)
               nested_class_indices << [node, index]
             elsif class_method?(node)
@@ -53,24 +56,25 @@ module RuboCop
           # Check if any nested class appears after any class method
           nested_class_indices.each do |nested_node, nested_idx|
             class_method_indices.each do |class_method_node, class_method_idx|
-              if nested_idx > class_method_idx
-                add_offense(
-                  nested_node,
-                  message: format(MSG, current: 'nested_classes', previous: 'public_class_methods')
-                )
-                break # Only report once per nested class
-              end
+              next if nested_idx <= class_method_idx
+
+              add_offense(
+                nested_node,
+                message: format(MSG, current: 'nested_classes', previous: 'public_class_methods'),
+              )
+              break # Only report once per nested class
             end
           end
         end
 
+        sig { params(elements: T::Array[RuboCop::AST::Node]).void }
         def check_class_methods_vs_instance_methods(elements)
           class_method_indices = []
           instance_method_indices = []
 
           elements.each_with_index do |node, index|
-            next unless node # Skip nil nodes
-            
+            next if !node # Skip nil nodes
+
             if class_method?(node)
               class_method_indices << [node, index]
             elsif instance_method?(node)
@@ -83,49 +87,58 @@ module RuboCop
           # Check if any class method appears after any instance method
           class_method_indices.each do |class_method_node, class_method_idx|
             instance_method_indices.each do |instance_node, instance_idx|
-              if class_method_idx > instance_idx
-                add_offense(
-                  class_method_node,
-                  message: format(MSG, current: 'public_class_methods', previous: 'public_methods')
-                )
-                break # Only report once per class method
-              end
+              next if class_method_idx <= instance_idx
+
+              add_offense(
+                class_method_node,
+                message: format(MSG, current: 'public_class_methods', previous: 'public_methods'),
+              )
+              break # Only report once per class method
             end
           end
         end
 
+        sig { params(node: RuboCop::AST::Node).returns(T::Boolean) }
         def nested_class?(node)
           node.class_type? || node.module_type?
         end
 
+        sig { params(node: RuboCop::AST::Node).returns(T::Boolean) }
         def class_method?(node)
           node.sclass_type? # class << self
         end
 
+        sig { params(node: RuboCop::AST::Node).returns(T::Boolean) }
         def instance_method?(node)
           node.def_type? && !node.defs_type? # def method, not def self.method
         end
 
+        sig { params(node: RuboCop::AST::Node).returns(T::Boolean) }
         def graphql_object_type?(node)
-          node.send_type? && node.method_name == :object_type
+          node.send_type? && T.cast(node, RuboCop::AST::SendNode).method_name == :object_type
         end
 
+        sig { params(node: RuboCop::AST::Node).returns(T::Boolean) }
         def graphql_field?(node)
-          return false unless node.send_type?
+          return false if !node.send_type?
+
+          node = T.cast(node, RuboCop::AST::SendNode)
           [:field, :implements].include?(node.method_name)
         end
 
+        sig { params(elements: T::Array[RuboCop::AST::Node]).void }
         def check_graphql_ordering(elements)
           check_graphql_object_type_vs_constants(elements)
           check_class_methods_vs_graphql_fields(elements)
         end
 
+        sig { params(elements: T::Array[RuboCop::AST::Node]).void }
         def check_graphql_object_type_vs_constants(elements)
           object_type_indices = []
           constant_indices = []
 
           elements.each_with_index do |node, index|
-            next unless node
+            next if !node
 
             if graphql_object_type?(node)
               object_type_indices << [node, index]
@@ -139,23 +152,24 @@ module RuboCop
           # Check if any object_type appears after any constant
           object_type_indices.each do |object_type_node, object_type_idx|
             constant_indices.each do |constant_node, constant_idx|
-              if object_type_idx > constant_idx
-                add_offense(
-                  object_type_node,
-                  message: format(MSG, current: 'graphql_object_types', previous: 'constants')
-                )
-                break
-              end
+              next if object_type_idx <= constant_idx
+
+              add_offense(
+                object_type_node,
+                message: format(MSG, current: 'graphql_object_types', previous: 'constants'),
+              )
+              break
             end
           end
         end
 
+        sig { params(elements: T::Array[RuboCop::AST::Node]).void }
         def check_class_methods_vs_graphql_fields(elements)
           class_method_indices = []
           graphql_field_indices = []
 
           elements.each_with_index do |node, index|
-            next unless node
+            next if !node
 
             if class_method?(node)
               class_method_indices << [node, index]
@@ -169,24 +183,26 @@ module RuboCop
           # Check if any class method appears after any GraphQL field
           class_method_indices.each do |class_method_node, class_method_idx|
             graphql_field_indices.each do |graphql_field_node, graphql_field_idx|
-              if class_method_idx > graphql_field_idx
-                add_offense(
-                  class_method_node,
-                  message: format(MSG, current: 'public_class_methods', previous: 'graphql_fields')
-                )
-                break
-              end
+              next if class_method_idx <= graphql_field_idx
+
+              add_offense(
+                class_method_node,
+                message: format(MSG, current: 'public_class_methods', previous: 'graphql_fields'),
+              )
+              break
             end
           end
         end
 
+        sig { params(node: RuboCop::AST::Node).returns(T::Boolean) }
         def constant?(node)
           node.casgn_type?
         end
 
+        sig { params(class_node: T.any(RuboCop::AST::ClassNode, RuboCop::AST::SelfClassNode)).returns(T::Array[RuboCop::AST::Node]) }
         def class_elements(class_node)
           body = class_node.body
-          return [] unless body
+          return [] if !body
 
           if body.begin_type?
             body.children.compact

@@ -6,8 +6,6 @@ require 'lint_roller'
 module RuboCop
   module Angellist
     class Plugin < LintRoller::Plugin
-      extend T::Sig
-
       sig { returns(LintRoller::About) }
       def about
         LintRoller::About.new(

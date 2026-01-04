@@ -26,6 +26,7 @@ Angellist/ClassStructure:
   Enabled: true
   VersionAdded: "1.0.4"
   Severity: warning
+  SafeAutoCorrect: false
   ExpectedOrder:
     - module_inclusion
     - graphql_object_types

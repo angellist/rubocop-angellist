@@ -14,7 +14,6 @@ module RuboCop
       #   Date.current
       #
       class PreferDateCurrent < ::RuboCop::Cop::Base
-        extend T::Sig
         extend AutoCorrector
 
         MSG = 'Use `Date.current` instead of `Time.zone.today`.'
