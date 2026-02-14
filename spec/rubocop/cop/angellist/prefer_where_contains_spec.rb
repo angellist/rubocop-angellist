@@ -55,4 +55,10 @@ RSpec.describe RuboCop::Cop::Angellist::PreferWhereContains, :config do
       execute("SELECT * FROM t WHERE tags @> ARRAY['ruby']")
     RUBY
   end
+
+  it 'does not register an offense when `@>` only appears in a bind value' do
+    expect_no_offenses(<<~RUBY)
+      Model.where("data = ?", "@> not sql")
+    RUBY
+  end
 end

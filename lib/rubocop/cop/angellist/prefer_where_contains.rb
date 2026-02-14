@@ -30,12 +30,10 @@ module RuboCop
         def on_send(node)
           return if !node.arguments?
 
-          node.arguments.each do |arg|
-            next if !string_containing_contains_operator?(arg)
+          first_arg = node.first_argument
+          return if !first_arg || !string_containing_contains_operator?(first_arg)
 
-            add_offense(node)
-            return
-          end
+          add_offense(node)
         end
 
         private
