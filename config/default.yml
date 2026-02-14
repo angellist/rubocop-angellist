@@ -21,6 +21,11 @@ Angellist/ForbidInstanceVariableGetSet:
   Enabled: false
   VersionAdded: "1.0.3"
 
+Angellist/PreferWhereContains:
+  Description: "Prefer `.where.contains` over literal `@>` SQL in `.where` calls"
+  Enabled: true
+  VersionAdded: "1.1.4"
+
 Angellist/ClassStructure:
   Description: "Enforces strict class ordering (built ontop of Layout::ClassStructure)"
   Enabled: true
