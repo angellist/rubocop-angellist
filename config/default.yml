@@ -21,6 +21,11 @@ Angellist/ForbidInstanceVariableGetSet:
   Enabled: false
   VersionAdded: "1.0.3"
 
+Angellist/TimecopWithoutBlock:
+  Description: "Always use the block form of Timecop.freeze and Timecop.travel."
+  Enabled: true
+  VersionAdded: "1.1.4"
+
 Angellist/ClassStructure:
   Description: "Enforces strict class ordering (built ontop of Layout::ClassStructure)"
   Enabled: true
