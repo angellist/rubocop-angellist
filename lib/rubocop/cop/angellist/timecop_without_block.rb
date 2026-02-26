@@ -42,7 +42,7 @@ module RuboCop
         sig { params(node: RuboCop::AST::Node).void }
         def on_send(node)
           return if !timecop_call?(node)
-          return if node.block_literal? || node.parent&.block_type?
+          return if node.block_literal?
 
           add_offense(node, message: format(MSG, method: "Timecop.#{node.method_name}"))
         end
