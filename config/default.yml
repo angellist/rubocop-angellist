@@ -26,6 +26,12 @@ Angellist/TimecopWithoutBlock:
   Enabled: true
   VersionAdded: "1.1.4"
 
+Angellist/RedundantExtendTSig:
+  Description: "Remove unnecessary `extend T::Sig` since `sig` is monkey-patched into Module."
+  Enabled: true
+  VersionAdded: "1.1.5"
+  SafeAutoCorrect: true
+
 Angellist/ClassStructure:
   Description: "Enforces strict class ordering (built ontop of Layout::ClassStructure)"
   Enabled: true
