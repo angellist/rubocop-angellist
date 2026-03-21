@@ -47,8 +47,9 @@ module RuboCop
         MSG = 'Unnecessary `extend T::Sig`. `sig` is already available without it.'
 
         # @!method extend_t_sig?(node)
+        # @!method extend_t_sig?(node)
         def_node_matcher :extend_t_sig?, <<~PATTERN
-          (send nil? :extend (const (const nil? :T) :Sig))
+          (send nil? :extend (const (const {nil? (cbase)} :T) :Sig))
         PATTERN
 
         sig { params(node: RuboCop::AST::SendNode).void }
