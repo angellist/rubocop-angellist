@@ -46,6 +46,8 @@ module RuboCop
 
         MSG = 'Unnecessary `extend T::Sig`. `sig` is already available without it.'
 
+        RESTRICT_ON_SEND = [:extend].freeze
+
         # @!method extend_t_sig?(node)
         # @!method extend_t_sig?(node)
         def_node_matcher :extend_t_sig?, <<~PATTERN
