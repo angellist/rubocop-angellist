@@ -4,38 +4,31 @@
 module RuboCop
   module Cop
     module Angellist
-      # Requires all GraphQL fields with snake_case names to have an explicit
-      # `method:` or `resolver_method:` option. This makes the mapping between
-      # the camelCase GraphQL field name and the snake_case Ruby method explicit,
-      # improving readability and preventing subtle bugs.
+      # Requires all GraphQL fields to have an explicit `method:` or
+      # `resolver_method:` option. This makes the mapping between the GraphQL
+      # field name and the Ruby method explicit, improving readability and
+      # preventing subtle bugs.
       #
-      # Fields that are already camelCase or single-word (no underscores) are
-      # not flagged, since they don't need the mapping.
-      #
-      # Fields with `camelize: false` are also not flagged, since they
-      # intentionally preserve their exact casing.
+      # Fields with `camelize: false` are not flagged, since they intentionally
+      # preserve their exact casing.
       #
       # @example
-      #   # bad — implicit mapping from snake_case to camelCase
+      #   # bad — no explicit method mapping
       #   field :post_money_valuation, Types::MoneyType, null: true
+      #   field :id, ID, null: false
       #
       #   # good — explicit method: mapping
       #   field :postMoneyValuation, Types::MoneyType, method: :post_money_valuation, null: true
+      #   field :id, ID, method: :id, null: false
       #
       #   # good — explicit resolver_method: mapping (when type class defines a custom def)
       #   field :postMoneyValuation, Types::MoneyType, resolver_method: :post_money_valuation, null: true
-      #
-      #   # good — single-word field, no mapping needed
-      #   field :id, ID, null: false
-      #
-      #   # good — already has method: option
-      #   field :avatarUrl, String, method: :avatar, null: true
+      #   field :id, ID, resolver_method: :id, null: false
       #
       class GraphqlExplicitMethod < Base
-        MSG = 'GraphQL field `:%<field_name>s` contains underscores but has no explicit `method:` or ' \
+        MSG = 'GraphQL field `:%<field_name>s` has no explicit `method:` or ' \
               '`resolver_method:` option. Add `method: :%<field_name>s` (if delegating to the data object) ' \
-              'or `resolver_method: :%<field_name>s` (if a custom def exists in this class) and rename ' \
-              'the field symbol to camelCase.'
+              'or `resolver_method: :%<field_name>s` (if a custom def exists in this class).'
 
         RESTRICT_ON_SEND = [:field].freeze
 
@@ -57,9 +50,6 @@ module RuboCop
         def on_send(node)
           name = field_name(node)
           return if !name
-
-          # Only flag fields with underscores (snake_case)
-          return if !name.to_s.include?('_')
 
           # Skip if already has method: or resolver_method:
           return if has_method_option?(node)
