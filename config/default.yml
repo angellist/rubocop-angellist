@@ -32,6 +32,15 @@ Angellist/RedundantExtendTSig:
   VersionAdded: "1.1.5"
   SafeAutoCorrect: true
 
+Angellist/GraphqlResolverMethod:
+  Description: "Use `resolver_method:` instead of `method:` when the type class defines a custom resolver def for the field."
+  Enabled: true
+  VersionAdded: "1.1.6"
+  SafeAutoCorrect: true
+  Include:
+    - 'app/graphql/**/*.rb'
+    - 'backend/**/app/graphql/**/*.rb'
+
 Angellist/ClassStructure:
   Description: "Enforces strict class ordering (built ontop of Layout::ClassStructure)"
   Enabled: true
