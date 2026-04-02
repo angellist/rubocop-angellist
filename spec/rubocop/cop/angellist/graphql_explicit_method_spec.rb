@@ -85,6 +85,31 @@ RSpec.describe RuboCop::Cop::Angellist::GraphqlExplicitMethod, :config do
     RUBY
   end
 
+  it 'does not register an offense for field without type arg when method: is present' do
+    expect_no_offenses(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :id, method: :id, null: false
+      end
+    RUBY
+  end
+
+  it 'does not register an offense for field without type arg when camelize: false' do
+    expect_no_offenses(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :some_name, camelize: false, null: true
+      end
+    RUBY
+  end
+
+  it 'registers an offense for field without type arg and no method:' do
+    expect_offense(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :name, null: true
+        ^^^^^^^^^^^^^^^^^^^^^^^ GraphQL field `:name` has no explicit `method:` or `resolver_method:` option. Add `method: :name` (if delegating to the data object) or `resolver_method: :name` (if a custom def exists in this class).
+      end
+    RUBY
+  end
+
   it 'flags field even when it has other options but no method:' do
     expect_offense(<<~RUBY)
       class Types::MyType < Types::BaseObject

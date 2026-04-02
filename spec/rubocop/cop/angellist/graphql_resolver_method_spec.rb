@@ -134,6 +134,29 @@ RSpec.describe RuboCop::Cop::Angellist::GraphqlResolverMethod, :config do
     RUBY
   end
 
+  it 'registers an offense for field without type arg when method: matches a def' do
+    expect_offense(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :postMoneyValuation, method: :post_money_valuation, null: true
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `method: :post_money_valuation` will call `object.post_money_valuation` (the data object), but this class defines `def post_money_valuation` which is a resolver on the type class. Use `resolver_method: :post_money_valuation` instead so the custom resolver is called.
+
+        def post_money_valuation
+          object&.valuation&.to_money
+        end
+      end
+    RUBY
+
+    expect_correction(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :postMoneyValuation, resolver_method: :post_money_valuation, null: true
+
+        def post_money_valuation
+          object&.valuation&.to_money
+        end
+      end
+    RUBY
+  end
+
   it 'does not flag private defs in a different class' do
     expect_no_offenses(<<~RUBY)
       class Types::MyType < Types::BaseObject

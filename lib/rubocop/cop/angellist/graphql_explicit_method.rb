@@ -39,12 +39,18 @@ module RuboCop
 
         # @!method has_method_option?(node)
         def_node_matcher :has_method_option?, <<~PATTERN
-          (send nil? :field _ _+ (hash <(pair (sym {:method :resolver_method}) _) ...>))
+          {
+            (send nil? :field _ _* (hash <(pair (sym {:method :resolver_method}) _) ...>))
+            (send nil? :field _ (hash <(pair (sym {:method :resolver_method}) _) ...>))
+          }
         PATTERN
 
         # @!method has_camelize_false?(node)
         def_node_matcher :has_camelize_false?, <<~PATTERN
-          (send nil? :field _ _+ (hash <(pair (sym :camelize) (false)) ...>))
+          {
+            (send nil? :field _ _* (hash <(pair (sym :camelize) (false)) ...>))
+            (send nil? :field _ (hash <(pair (sym :camelize) (false)) ...>))
+          }
         PATTERN
 
         def on_send(node)

@@ -47,7 +47,10 @@ module RuboCop
 
         # @!method field_with_method_option(node)
         def_node_matcher :field_with_method_option, <<~PATTERN
-          (send nil? :field _ _+ (hash <(pair (sym :method) (sym $_)) ...>))
+          {
+            (send nil? :field _ _* (hash <(pair (sym :method) (sym $_)) ...>))
+            (send nil? :field _ (hash <(pair (sym :method) (sym $_)) ...>))
+          }
         PATTERN
 
         def on_send(node)
