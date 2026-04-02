@@ -26,6 +26,8 @@ module RuboCop
       #   field :id, ID, resolver_method: :id, null: false
       #
       class GraphqlExplicitMethod < Base
+        extend AutoCorrector
+
         MSG = 'GraphQL field `:%<field_name>s` has no explicit `method:` or ' \
               '`resolver_method:` option. Add `method: :%<field_name>s` (if delegating to the data object) ' \
               'or `resolver_method: :%<field_name>s` (if a custom def exists in this class).'
@@ -53,6 +55,14 @@ module RuboCop
           }
         PATTERN
 
+        # @!method has_resolver_or_mutation?(node)
+        def_node_matcher :has_resolver_or_mutation?, <<~PATTERN
+          {
+            (send nil? :field _ _* (hash <(pair (sym {:resolver :mutation}) _) ...>))
+            (send nil? :field _ (hash <(pair (sym {:resolver :mutation}) _) ...>))
+          }
+        PATTERN
+
         def on_send(node)
           name = field_name(node)
           return if !name
@@ -63,8 +73,51 @@ module RuboCop
           # Skip if camelize: false
           return if has_camelize_false?(node)
 
+          # Skip if field uses resolver: or mutation: (delegates resolution entirely)
+          return if has_resolver_or_mutation?(node)
+
+          name_str = name.to_s
           message = format(MSG, field_name: name)
-          add_offense(node, message: message)
+          add_offense(node, message: message) do |corrector|
+            # Determine the method name to use
+            method_name = underscore(name_str)
+            option_key = resolver_method_needed?(node, method_name) ? 'resolver_method' : 'method'
+            insert_method_option(corrector, node, option_key, method_name)
+          end
+        end
+
+        private
+
+        def resolver_method_needed?(node, method_name)
+          enclosing_class = node.each_ancestor(:class, :module).first
+          return false if !enclosing_class
+
+          method_sym = method_name.to_sym
+          enclosing_class.body&.each_descendant(:def)&.any? do |def_node|
+            def_node.method_name == method_sym
+          end
+        end
+
+        def underscore(str)
+          str.gsub(/([a-z\d])([A-Z])/, '\1_\2').downcase
+        end
+
+        def insert_method_option(corrector, node, option_key, method_name)
+          hash_node = find_hash_arg(node)
+          if hash_node
+            first_pair = hash_node.pairs.first
+            corrector.insert_before(first_pair, "#{option_key}: :#{method_name}, ")
+          else
+            # No hash arg exists; append after the last argument
+            corrector.insert_after(node.last_argument, ", #{option_key}: :#{method_name}")
+          end
+        end
+
+        def find_hash_arg(node)
+          node.arguments.each do |arg|
+            return arg if arg.hash_type?
+          end
+          nil
         end
       end
     end

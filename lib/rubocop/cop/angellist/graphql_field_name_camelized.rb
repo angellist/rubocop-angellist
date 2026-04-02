@@ -12,6 +12,13 @@ module RuboCop
       # Fields with `camelize: false` are exempt since they intentionally
       # preserve their exact casing.
       #
+      # @safety
+      #   Auto-correction renames the field symbol to camelCase and adds an
+      #   explicit `method:` or `resolver_method:` pointing to the original
+      #   snake_case name. If the field already has `method:` or
+      #   `resolver_method:`, the existing option is preserved and only the
+      #   field name is renamed.
+      #
       # @example
       #   # bad — snake_case field name
       #   field :post_money_valuation, Types::MoneyType, null: true
@@ -29,6 +36,8 @@ module RuboCop
       #   field :only_needs_kyc, Boolean, camelize: false, null: true
       #
       class GraphqlFieldNameCamelized < Base
+        extend AutoCorrector
+
         MSG = 'GraphQL field `:%<field_name>s` uses snake_case. Use camelCase instead ' \
               '(e.g., `:%<camelized_name>s`) with an explicit `method:` or `resolver_method:` option.'
 
@@ -47,6 +56,14 @@ module RuboCop
           }
         PATTERN
 
+        # @!method has_method_or_resolver_method?(node)
+        def_node_matcher :has_method_or_resolver_method?, <<~PATTERN
+          {
+            (send nil? :field _ _* (hash <(pair (sym {:method :resolver_method}) _) ...>))
+            (send nil? :field _ (hash <(pair (sym {:method :resolver_method}) _) ...>))
+          }
+        PATTERN
+
         def on_send(node)
           name = field_name(node)
           return if !name
@@ -61,7 +78,17 @@ module RuboCop
 
           camelized = camelize(name_str)
           message = format(MSG, field_name: name, camelized_name: camelized)
-          add_offense(node, message: message)
+          add_offense(node, message: message) do |corrector|
+            # 1. Rename the field symbol to camelCase
+            field_sym_node = node.first_argument
+            corrector.replace(field_sym_node, ":#{camelized}")
+
+            # 2. Add method:/resolver_method: if not already present
+            next if has_method_or_resolver_method?(node)
+
+            option_key = resolver_method_needed?(node, name) ? 'resolver_method' : 'method'
+            insert_method_option(corrector, node, option_key, name_str)
+          end
         end
 
         private
@@ -69,6 +96,33 @@ module RuboCop
         def camelize(str)
           parts = str.split('_')
           parts[0] + parts[1..].map(&:capitalize).join
+        end
+
+        def resolver_method_needed?(node, field_name)
+          enclosing_class = node.each_ancestor(:class, :module).first
+          return false if !enclosing_class
+
+          enclosing_class.body&.each_descendant(:def)&.any? do |def_node|
+            def_node.method_name == field_name
+          end
+        end
+
+        def insert_method_option(corrector, node, option_key, method_name)
+          hash_node = find_hash_arg(node)
+          if hash_node
+            first_pair = hash_node.pairs.first
+            corrector.insert_before(first_pair, "#{option_key}: :#{method_name}, ")
+          else
+            # No hash arg exists; append after the last argument
+            corrector.insert_after(node.last_argument, ", #{option_key}: :#{method_name}")
+          end
+        end
+
+        def find_hash_arg(node)
+          node.arguments.each do |arg|
+            return arg if arg.hash_type?
+          end
+          nil
         end
       end
     end
