@@ -32,6 +32,14 @@ Angellist/RedundantExtendTSig:
   VersionAdded: "1.1.5"
   SafeAutoCorrect: true
 
+Angellist/GraphqlFieldNameCamelized:
+  Description: "Ensure GraphQL field names use camelCase instead of snake_case."
+  Enabled: true
+  VersionAdded: "1.1.6"
+  Include:
+    - 'app/graphql/**/*.rb'
+    - 'backend/**/app/graphql/**/*.rb'
+
 Angellist/GraphqlExplicitMethod:
   Description: "Require explicit `method:` or `resolver_method:` on snake_case GraphQL fields."
   Enabled: true
