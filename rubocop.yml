@@ -48,6 +48,7 @@ GraphQL/FieldDescription: { Enabled: false }
 GraphQL/FieldName: { Enabled: false }
 GraphQL/FieldMethod: { Enabled: true, AutoCorrect: false }
 GraphQL/ObjectDescription: { Enabled: false }
+GraphQL/UnnecessaryFieldAlias: { Enabled: false }
 
 Layout/ArgumentAlignment: { EnforcedStyle: with_fixed_indentation }
 # Layout/ClassStructure is replaced by Angellist/ClassStructure
