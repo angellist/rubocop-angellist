@@ -32,6 +32,14 @@ Angellist/RedundantExtendTSig:
   VersionAdded: "1.1.5"
   SafeAutoCorrect: true
 
+Angellist/GraphqlExplicitObject:
+  Description: "Require GraphQL type classes to declare object_type(ClassName)."
+  Enabled: true
+  VersionAdded: "1.1.6"
+  Include:
+    - 'app/graphql/**/*.rb'
+    - 'backend/**/app/graphql/**/*.rb'
+
 Angellist/GraphqlFieldNameCamelized:
   Description: "Ensure GraphQL field names use camelCase instead of snake_case."
   Enabled: true
