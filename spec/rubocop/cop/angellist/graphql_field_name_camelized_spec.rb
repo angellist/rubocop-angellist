@@ -137,4 +137,61 @@ RSpec.describe RuboCop::Cop::Angellist::GraphqlFieldNameCamelized, :config do
       end
     RUBY
   end
+
+  it 'auto-corrects but skips inserting method: for resolver: fields' do
+    expect_offense(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :post_money_valuation, Types::MoneyType, resolver: Resolvers::PostMoneyValuation, null: true
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GraphQL field `:post_money_valuation` uses snake_case. Use camelCase instead (e.g., `:postMoneyValuation`) with an explicit `method:` or `resolver_method:` option.
+      end
+    RUBY
+
+    expect_correction(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :postMoneyValuation, Types::MoneyType, resolver: Resolvers::PostMoneyValuation, null: true
+      end
+    RUBY
+  end
+
+  it 'auto-corrects but skips inserting method: for mutation: fields' do
+    expect_offense(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :create_round, mutation: Mutations::CreateRound
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GraphQL field `:create_round` uses snake_case. Use camelCase instead (e.g., `:createRound`) with an explicit `method:` or `resolver_method:` option.
+      end
+    RUBY
+
+    expect_correction(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :createRound, mutation: Mutations::CreateRound
+      end
+    RUBY
+  end
+
+  it 'does not use resolver_method: for defs in nested classes' do
+    expect_offense(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :post_money_valuation, Types::MoneyType, null: true
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GraphQL field `:post_money_valuation` uses snake_case. Use camelCase instead (e.g., `:postMoneyValuation`) with an explicit `method:` or `resolver_method:` option.
+
+        class NestedType < Types::BaseObject
+          def post_money_valuation
+            object.valuation
+          end
+        end
+      end
+    RUBY
+
+    expect_correction(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :postMoneyValuation, Types::MoneyType, method: :post_money_valuation, null: true
+
+        class NestedType < Types::BaseObject
+          def post_money_valuation
+            object.valuation
+          end
+        end
+      end
+    RUBY
+  end
 end

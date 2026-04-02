@@ -66,7 +66,7 @@ RSpec.describe RuboCop::Cop::Angellist::GraphqlExplicitMethod, :config do
     expect_offense(<<~RUBY)
       class Types::MyType < Types::BaseObject
         field :postMoneyValuation, Types::MoneyType, null: true
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GraphQL field `:postMoneyValuation` has no explicit `method:` or `resolver_method:` option. Add `method: :postMoneyValuation` (if delegating to the data object) or `resolver_method: :postMoneyValuation` (if a custom def exists in this class).
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GraphQL field `:postMoneyValuation` has no explicit `method:` or `resolver_method:` option. Add `method: :post_money_valuation` (if delegating to the data object) or `resolver_method: :post_money_valuation` (if a custom def exists in this class).
       end
     RUBY
 
@@ -184,7 +184,7 @@ RSpec.describe RuboCop::Cop::Angellist::GraphqlExplicitMethod, :config do
     expect_offense(<<~RUBY)
       class Types::MyType < Types::BaseObject
         field :postMoneyValuation, Types::MoneyType, null: true
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GraphQL field `:postMoneyValuation` has no explicit `method:` or `resolver_method:` option. Add `method: :postMoneyValuation` (if delegating to the data object) or `resolver_method: :postMoneyValuation` (if a custom def exists in this class).
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GraphQL field `:postMoneyValuation` has no explicit `method:` or `resolver_method:` option. Add `method: :post_money_valuation` (if delegating to the data object) or `resolver_method: :post_money_valuation` (if a custom def exists in this class).
 
         def post_money_valuation
           object.valuation
@@ -215,6 +215,33 @@ RSpec.describe RuboCop::Cop::Angellist::GraphqlExplicitMethod, :config do
     expect_no_offenses(<<~RUBY)
       class Types::MyType < Types::BaseObject
         field :create_round, mutation: Mutations::CreateRound
+      end
+    RUBY
+  end
+
+  it 'does not use resolver_method: for defs in nested classes' do
+    expect_offense(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :post_money_valuation, Types::MoneyType, null: true
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GraphQL field `:post_money_valuation` has no explicit `method:` or `resolver_method:` option. Add `method: :post_money_valuation` (if delegating to the data object) or `resolver_method: :post_money_valuation` (if a custom def exists in this class).
+
+        class NestedType < Types::BaseObject
+          def post_money_valuation
+            object.valuation
+          end
+        end
+      end
+    RUBY
+
+    expect_correction(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :post_money_valuation, Types::MoneyType, method: :post_money_valuation, null: true
+
+        class NestedType < Types::BaseObject
+          def post_money_valuation
+            object.valuation
+          end
+        end
       end
     RUBY
   end

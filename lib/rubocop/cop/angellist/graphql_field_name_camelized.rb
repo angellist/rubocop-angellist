@@ -37,6 +37,7 @@ module RuboCop
       #
       class GraphqlFieldNameCamelized < Base
         extend AutoCorrector
+        include GraphqlFieldHelpers
 
         MSG = 'GraphQL field `:%<field_name>s` uses snake_case. Use camelCase instead ' \
               '(e.g., `:%<camelized_name>s`) with an explicit `method:` or `resolver_method:` option.'
@@ -64,6 +65,14 @@ module RuboCop
           }
         PATTERN
 
+        # @!method has_resolver_or_mutation?(node)
+        def_node_matcher :has_resolver_or_mutation?, <<~PATTERN
+          {
+            (send nil? :field _ _* (hash <(pair (sym {:resolver :mutation}) _) ...>))
+            (send nil? :field _ (hash <(pair (sym {:resolver :mutation}) _) ...>))
+          }
+        PATTERN
+
         def on_send(node)
           name = field_name(node)
           return if !name
@@ -86,6 +95,9 @@ module RuboCop
             # 2. Add method:/resolver_method: if not already present
             next if has_method_or_resolver_method?(node)
 
+            # Skip inserting method: for resolver/mutation fields
+            next if has_resolver_or_mutation?(node)
+
             option_key = resolver_method_needed?(node, name) ? 'resolver_method' : 'method'
             insert_method_option(corrector, node, option_key, name_str)
           end
@@ -96,33 +108,6 @@ module RuboCop
         def camelize(str)
           parts = str.split('_')
           parts[0] + parts[1..].map(&:capitalize).join
-        end
-
-        def resolver_method_needed?(node, field_name)
-          enclosing_class = node.each_ancestor(:class, :module).first
-          return false if !enclosing_class
-
-          enclosing_class.body&.each_descendant(:def)&.any? do |def_node|
-            def_node.method_name == field_name
-          end
-        end
-
-        def insert_method_option(corrector, node, option_key, method_name)
-          hash_node = find_hash_arg(node)
-          if hash_node
-            first_pair = hash_node.pairs.first
-            corrector.insert_before(first_pair, "#{option_key}: :#{method_name}, ")
-          else
-            # No hash arg exists; append after the last argument
-            corrector.insert_after(node.last_argument, ", #{option_key}: :#{method_name}")
-          end
-        end
-
-        def find_hash_arg(node)
-          node.arguments.each do |arg|
-            return arg if arg.hash_type?
-          end
-          nil
         end
       end
     end

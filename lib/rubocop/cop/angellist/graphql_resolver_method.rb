@@ -38,6 +38,7 @@ module RuboCop
       #
       class GraphqlResolverMethod < Base
         extend AutoCorrector
+        include GraphqlFieldHelpers
 
         MSG = '`method: :%<method_name>s` will call `object.%<method_name>s` (the data object), ' \
               'but this class defines `def %<method_name>s` which is a resolver on the type class. ' \
@@ -76,12 +77,6 @@ module RuboCop
         end
 
         private
-
-        def class_defines_method?(class_node, method_name)
-          class_node.body&.each_descendant(:def)&.any? do |def_node|
-            def_node.method_name == method_name
-          end
-        end
 
         def find_method_pair(field_node)
           field_node.arguments.each do |arg|

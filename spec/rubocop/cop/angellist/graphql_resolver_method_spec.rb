@@ -170,4 +170,18 @@ RSpec.describe RuboCop::Cop::Angellist::GraphqlResolverMethod, :config do
       end
     RUBY
   end
+
+  it 'does not flag defs in nested classes' do
+    expect_no_offenses(<<~RUBY)
+      class Types::MyType < Types::BaseObject
+        field :postMoneyValuation, Types::MoneyType, method: :post_money_valuation, null: true
+
+        class NestedType < Types::BaseObject
+          def post_money_valuation
+            object&.valuation&.to_money
+          end
+        end
+      end
+    RUBY
+  end
 end

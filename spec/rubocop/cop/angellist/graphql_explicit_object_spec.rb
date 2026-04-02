@@ -47,6 +47,14 @@ RSpec.describe RuboCop::Cop::Angellist::GraphqlExplicitObject, :config do
     RUBY
   end
 
+  it 'does not register an offense for nested MutationType classes' do
+    expect_no_offenses(<<~RUBY)
+      class Types::Invest::MutationType < Types::BaseObject
+        field :createRound, mutation: Mutations::CreateRound
+      end
+    RUBY
+  end
+
   it 'does not register an offense for Base* classes' do
     expect_no_offenses(<<~RUBY)
       class Types::BaseObject < GraphQL::Schema::Object

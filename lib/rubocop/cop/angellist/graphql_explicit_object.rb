@@ -67,7 +67,7 @@ module RuboCop
 
           # Exempt QueryType, MutationType, and Base* classes
           short_name.end_with?('QueryType') ||
-            short_name == 'MutationType' ||
+            short_name.end_with?('MutationType') ||
             short_name.start_with?('Base') ||
             short_name == 'Venture'
         end
