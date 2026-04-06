@@ -65,6 +65,11 @@ Angellist/GraphqlResolverMethod:
     - 'app/graphql/**/*.rb'
     - 'backend/**/app/graphql/**/*.rb'
 
+Angellist/PreferWhereContains:
+  Description: "Prefer `.where.contains` over literal `@>` SQL in `.where` calls"
+  Enabled: true
+  VersionAdded: "1.1.7"
+
 Angellist/ClassStructure:
   Description: "Enforces strict class ordering (built ontop of Layout::ClassStructure)"
   Enabled: true
