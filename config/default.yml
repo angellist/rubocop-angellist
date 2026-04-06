@@ -21,10 +21,54 @@ Angellist/ForbidInstanceVariableGetSet:
   Enabled: false
   VersionAdded: "1.0.3"
 
+Angellist/TimecopWithoutBlock:
+  Description: "Always use the block form of Timecop.freeze and Timecop.travel."
+  Enabled: true
+  VersionAdded: "1.1.4"
+
+Angellist/RedundantExtendTSig:
+  Description: "Remove unnecessary `extend T::Sig` since `sig` is monkey-patched into Module."
+  Enabled: true
+  VersionAdded: "1.1.5"
+  SafeAutoCorrect: true
+
+Angellist/GraphqlExplicitObject:
+  Description: "Require GraphQL type classes to declare object_type(ClassName)."
+  Enabled: true
+  VersionAdded: "1.1.6"
+  Include:
+    - 'app/graphql/**/*.rb'
+    - 'backend/**/app/graphql/**/*.rb'
+
+Angellist/GraphqlFieldNameCamelized:
+  Description: "Ensure GraphQL field names use camelCase instead of snake_case."
+  Enabled: true
+  VersionAdded: "1.1.6"
+  Include:
+    - 'app/graphql/**/*.rb'
+    - 'backend/**/app/graphql/**/*.rb'
+
+Angellist/GraphqlExplicitMethod:
+  Description: "Require explicit `method:` or `resolver_method:` on snake_case GraphQL fields."
+  Enabled: true
+  VersionAdded: "1.1.6"
+  Include:
+    - 'app/graphql/**/*.rb'
+    - 'backend/**/app/graphql/**/*.rb'
+
+Angellist/GraphqlResolverMethod:
+  Description: "Use `resolver_method:` instead of `method:` when the type class defines a custom resolver def for the field."
+  Enabled: true
+  VersionAdded: "1.1.6"
+  SafeAutoCorrect: true
+  Include:
+    - 'app/graphql/**/*.rb'
+    - 'backend/**/app/graphql/**/*.rb'
+
 Angellist/PreferWhereContains:
   Description: "Prefer `.where.contains` over literal `@>` SQL in `.where` calls"
   Enabled: true
-  VersionAdded: "1.1.4"
+  VersionAdded: "1.1.7"
 
 Angellist/ClassStructure:
   Description: "Enforces strict class ordering (built ontop of Layout::ClassStructure)"
